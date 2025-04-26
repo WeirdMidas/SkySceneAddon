@@ -1,53 +1,40 @@
-# QTI-mem-opt
+# SkyScene Addon
 
-Memory management optimaization for Android platforms.  
+Memory management optimization for current Android platforms. Optimizing three central aspects: cached processes, scalable swapping and keeping as many applications as possible in the background, of course, avoiding OOM and Thrashing.
 
 ## Feature
 
-English version:
 - Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms
-- Solve the problem that the background can't hang even if the free memory is large, by removing Qualcomm specified ActivityManager CUR_MAX_EMPTY_PROCESSES
-- Customizable list of protected APPs, preventing them from being killed by Android in-kernel lowmemorykiller
+- Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
+- Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
-- Reduce jitters under high memory pressure, adjust the trigger threshold and execution interval of lowmemorykiller, and keep the file page cache at a high level
-- Reduce stucks under high memory pressure, reduce the probability of direct memory allocation via higher watermark_low
-- Disable adaptive lowmemorykiller
-- Prohibit kernel memory recycling threads running on the prime core, avoid congesting the main thread that is interacting and reduce energy consumption
-- Avoid swapping memory pages which are hard to compress to ZRAM, make the compression rate close to the ideal value of 2.8x
+- Prohibits kernel memory recycling threads for 7 cores, avoiding using all cores and reducing priority so they prefer small cores, reducing power consumption by up to 15mW
+- Swapping dynamically scales based on usage and is user-centric, enabling the system to recover memory even under heavy pressure. This allows users to run more apps simultaneously while improving the overall efficiency of memory compression. We aim to maintain an optimal compression ratio of 2.8x or higher, depending on the processor’s capabilities
+- Introduce hybrid swap! A virtual memory management technique that combines swapfile + zram + ppr, allowing swapping costs to be reduced by up to 27% and still increasing effective memory by 17% even with 1gb of swapfile, It also exponentially reduces writes to storage by allowing a more beneficial swapfile reclaim. As such, it can only be used to its full potential on devices with PPR (per-process reclaim) which are only found on phones with qualcomm processors. And hybrid swap is also required to activate the swapfile (if you use it together with ZRAM), if you do not have a snapdragon processor, hybrid swap can still be used, but only swapfile + zram, excluding ppr from the list (excluding swapping costs, reduced storage degradation and improved effective memory increase)
 - Customizable ZRAM size and compression algorithm(needs kernel support), ranging from 0G to 6G
+- Customizable swapfile size (needs hybrid swap active), ranges from 0G to 3G
 - SELinux can still be enabled
-
-中文版：
-- 纯粹的内存管理优化模块，不含其它大杂烩，支持所有主流平台
-- 解决即使剩余内存较多，后台也挂不住的问题，通过移除高通平台特有的最大空进程数量(CUR_MAX_EMPTY_PROCESSES)的限制
-- 可自定义受保护的APP列表，防止它们被安卓内核态LMK清除
-- 将系统常用文件固定在文件页面缓存，显著降低由于页面缓存波动导致关键缓存被换出造成卡屏的情况
-- 减轻高内存压力下掉帧，调整lowmemorykiller的触发阈值和执行周期，使文件页面缓存保持在较高水平
-- 减轻高内存压力下卡屏，较高的低内存水位线，降低触发直接内存分配的概率
-- 禁止自适应LMK激进地清理后台
-- 禁止内核内存回收线程运行在超大核，避免拥塞正在交互的主线程并且降低能耗
-- 避免难以压缩的内存页移入ZRAM，使得压缩率接近理想值2.8x
-- 可自定义的ZRAM大小和压缩算法(需要内核支持)，较大的值会延长解压缩时间，范围从0GB到6GB
-- SELinux可以保持开启状态
 
 ## Requirement
 
-- ARM/ARM64
-- Magisk >= 19.0
-- Android 6.0+
+- ARM64-v8a (64-bit)
+- Magisk or KSU
+- Android 12-15
 
 ## Installation
 
-- Magisk >= 19.0
-- 安装本模块重启，打开`/sdcard/Android/panel_qti_mem.txt`修改想要的ZRAM大小和压缩算法，重启后生效
-- 打开`/sdcard/Android/panel_adjshield.txt`添加需要保持在后台的APP包名，重启后生效
-- ZRAM大小默认值如下：
-  - 1-2GB内存默认开启1GB的ZRAM
-  - 3-4GB内存默认开启2GB的ZRAM
-  - 6-8GB内存默认开启4GB的ZRAM
-  - 12GB内存默认开启0GB的ZRAM
-- 目前不支持ZSWAP
-- 目前不支持用户态LMK
+- Magisk or KSU
+- Install this module and reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the default parameters like ZRAM size, compression algorithm and even enable hybrid swap and swapfile size, and it will take effect after reboot
+- Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot. - The default ZRAM size is as follows:
+  - 2GB of ram gets 1GB of ZRAM by default
+  - 3GB of ram gets 1.5GB of ZRAM by default
+  - 4GB of ram gets 2GB of ZRAM by default
+  - 6GB of ram gets 3GB of ZRAM by default
+  - 8GB of ram gets 4GB of ZRAM by default
+  - 12GB or more of ram gets 6GB of ZRAM by default
+  - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
+- ZSWAP is not currently supported
+- For now, no lmk is optimized, so rest assured that we will not touch your lmk (for now)
 
 ## FAQ
 
