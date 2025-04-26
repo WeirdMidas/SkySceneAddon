@@ -97,3 +97,4 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @方块白菜 --协助调试在联发科X10平台ZRAM相关功能  
 @Simple9 --协助诊断在Magisk低于19.0的不兼容问题  
 @〇MH1031 --协助诊断位于/system/bin二进制工具集的不兼容问题  
+@unintellectual-hypothesis -- by hybrid swap and some ZRAM diskzise
