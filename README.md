@@ -1,6 +1,6 @@
 # SkyScene Addon
 
-Memory management optimization for current Android platforms. Optimizing three central aspects: cached processes, scalable swapping and keeping as many applications as possible in the background, of course, avoiding OOM and Thrashing.
+Memory management optimization for current Android platforms. Optimizing four central aspects: cached processes, battery consumption, scalable swapping and keeping as many applications as possible in the background, avoiding, of course, respecting the system limits to avoid unnecessary OOM and Thrashing, so my dear user, RESPECT YOUR CELL PHONE!
 
 ## Feature
 
@@ -8,6 +8,7 @@ Memory management optimization for current Android platforms. Optimizing three c
 - Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
+- The module achieves the effect of backstage anti-killing by modifying the app killing mechanism (lmkd minfree). And by improving the back-end process management, the effect of making the system smoother, more decisive and saving power can be achieved. For now, this is only valid for lmkd in minfree format, psi and others have not taken advantage of this benefit
 - Prohibits kernel memory recycling threads for 7 cores, avoiding using all cores and reducing priority so they prefer small cores, reducing power consumption by up to 15mW
 - Swapping dynamically scales based on usage and is user-centric, enabling the system to recover memory even under heavy pressure. This allows users to run more apps simultaneously while improving the overall efficiency of memory compression. We aim to maintain an optimal compression ratio of 2.8x or higher, depending on the processor’s capabilities
 - Introduce hybrid swap! A virtual memory management technique that combines swapfile + zram + ppr, allowing swapping costs to be reduced by up to 27% and still increasing effective memory by 17% even with 1gb of swapfile, It also exponentially reduces writes to storage by allowing a more beneficial swapfile reclaim. As such, it can only be used to its full potential on devices with PPR (per-process reclaim) which are only found on phones with qualcomm processors. And hybrid swap is also required to activate the swapfile (if you use it together with ZRAM), if you do not have a snapdragon processor, hybrid swap can still be used, but only swapfile + zram, excluding ppr from the list (excluding swapping costs, reduced storage degradation and improved effective memory increase)
@@ -34,7 +35,7 @@ Memory management optimization for current Android platforms. Optimizing three c
   - 12GB or more of ram gets 6GB of ZRAM by default
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
-- For now, no lmk is optimized, so rest assured that we will not touch your lmk (for now)
+- old lmk, simple lmk and even lmkd psi are not supported at the moment
 
 ## FAQ
 
