@@ -35,7 +35,7 @@ Memory management optimization for current Android platforms. Optimizing four ce
   - 12GB or more of ram gets 6GB of ZRAM by default
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
-- old lmk, simple lmk and even lmkd psi are not supported at the moment
+- The optimized lmk is lmkd minfree. lmkd psi, simple lmk and even the old lmk are not supported at the moment
 
 ## FAQ
 
