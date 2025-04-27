@@ -5,6 +5,7 @@ Memory management optimization for current Android platforms. Optimizing four ce
 ## Feature
 
 - Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms
+- Highly optimized ROMs and kernels prefer to use lmkd with pure PSI to monitor and kill apps under real memory pressure (in cases where they haven't replaced it with simple lmk). However, on devices with 4GB or less, PSI alone is not ideal, because ANY peak can be considered pressure, even abnormal and normal ones. That's why SkyScene combines minfree + PSI: PSI monitors pressure, replacing the old vmpressure, and minfree acts as a final limit to kill apps only when really necessary. This combination improves system responsiveness, avoids aggressive shutdowns, and balances better performance, stability, and battery life
 - Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
@@ -36,7 +37,7 @@ Memory management optimization for current Android platforms. Optimizing four ce
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
 - ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
-- The optimized lmk is lmkd minfree. lmkd psi, simple lmk and even the old lmk are not supported at the moment
+- The lmk used for optimization is lmkd minfree and psi, where both are combined. If you have old lmk, or even simple lmk, they will not be optimized, showing no support for them
 
 ## FAQ
 
