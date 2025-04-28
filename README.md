@@ -21,6 +21,7 @@ Memory management optimization for current Android platforms. Optimizing four ce
 - ARM64-v8a (64-bit)
 - Magisk or KSU
 - Android 12-15
+- Have 2GB or more of memory in order to maximize the module's efficiency
 
 ## Installation
 
