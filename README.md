@@ -24,6 +24,7 @@ Memory management optimization for current Android platforms. Optimizing four ce
 
 ## Installation
 
+- - Do not download the module via zip from the repository! Until I know when to send all the files in a single commit, it will be out of date
 - Magisk or KSU
 - Install this module and reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the default parameters like ZRAM size, compression algorithm and even enable hybrid swap and swapfile size, and it will take effect after reboot
 - Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot. - The default ZRAM size is as follows:
