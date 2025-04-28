@@ -2,6 +2,10 @@
 
 Memory management optimization for current Android platforms. Optimizing four central aspects: cached processes, battery consumption, scalable swapping and keeping as many applications as possible in the background, of course, respecting the system limits to avoid unnecessary OOM and Thrashing, so my dear user, RESPECT YOUR CELL PHONE!
 
+SkyScene is based on the idea of ​​this module here: https://developer.aliyun.com/article/1230689.
+
+The goal of SkyScene is to resemble this Chinese module, but adapted for devices that do not use Scene 8 because it is paid, and also for devices with different amounts of memory (2gb or more). This makes SkyScene focus mainly on energy savings and system smoothness over memory management. This means that SkyScene focuses on being adaptable to all memory demands, light, moderate, heavy multitasking and even games, always prioritizing battery savings and consistency. But always respecting the limits of the user's hardware, never going beyond to avoid inconveniences such as OOM, Thrashing and even crashes or PANIC because an app was killed by lmkd by mistake and unbridled push from the user.
+
 ## Feature
 
 - Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms
@@ -41,6 +45,10 @@ Memory management optimization for current Android platforms. Optimizing four ce
 - The lmk used for optimization is lmkd minfree and psi, where both are combined. If you have old lmk, or even simple lmk, they will not be optimized, showing no support for them
 
 ## FAQ
+
+### How is the module tested for each version?
+
+Simple, initially my device couldn't handle 6 apps for a long time. So in the Yuki-Chan version (the first one I'll release) I'll try to keep 6 apps active in memory for 30 minutes. And with each version of the module, I'll try to add +2 apps to last 30 minutes. And so on, I'll always try to keep my multitasking stable.
 
 ### 使用解答
 
@@ -101,3 +109,4 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @Simple9 --协助诊断在Magisk低于19.0的不兼容问题  
 @〇MH1031 --协助诊断位于/system/bin二进制工具集的不兼容问题  
 @unintellectual-hypothesis -- by hybrid swap and some ZRAM diskzise
+lululoid -- extra lmkd adjustments, if you want RAM management totally focused on PSI, it is recommended to use its module (LMKD-PSI-ACTIVATOR) which is more recommended for devices with high-end cell phones that do not want so much "customization".
