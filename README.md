@@ -33,14 +33,14 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 - Do not download the module via zip from the repository! Until I know when to send all the files in a single commit, it will be out of date
 - Magisk or KSU
 - Install this module and reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the default parameters like ZRAM size, compression algorithm and even enable hybrid swap and swapfile size, and it will take effect after reboot
-- Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot.
+- Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot
 - The default ZRAM size is as follows:
-  - 2GB of ram gets 1GB of ZRAM by default
-  - 3GB of ram gets 1.5GB of ZRAM by default
-  - 4GB of ram gets 2GB of ZRAM by default
-  - 6GB of ram gets 3GB of ZRAM by default
-  - 8GB of ram gets 4GB of ZRAM by default
-  - 12GB or more of ram gets 6GB of ZRAM by default
+  - 2GB of RAM gets 1GB of ZRAM by default
+  - 3GB of RAM gets 1.5GB of ZRAM by default
+  - 4GB of RAM gets 2GB of ZRAM by default
+  - 6GB of RAM gets 3GB of ZRAM by default
+  - 8GB of RAM gets 4GB of ZRAM by default
+  - 12GB or more of RAM gets 6GB of ZRAM by default
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
 - ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
