@@ -32,7 +32,8 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 - Do not download the module via zip from the repository! Until I know when to send all the files in a single commit, it will be out of date
 - Magisk or KSU
 - Install this module and reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the default parameters like ZRAM size, compression algorithm and even enable hybrid swap and swapfile size, and it will take effect after reboot
-- Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot. - The default ZRAM size is as follows:
+- Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot.
+- The default ZRAM size is as follows:
   - 2GB of ram gets 1GB of ZRAM by default
   - 3GB of ram gets 1.5GB of ZRAM by default
   - 4GB of ram gets 2GB of ZRAM by default
