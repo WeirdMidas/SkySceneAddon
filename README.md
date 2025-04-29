@@ -6,7 +6,7 @@ SkyScene is based on the idea of ​​this module here: https://developer.aliyu
 
 The goal of SkyScene is to resemble this Chinese module, but adapted for devices that do not use Scene 8 because it is paid, and also for devices with different amounts of memory (2gb or more). This makes SkyScene focus mainly on energy savings and system smoothness over memory management. This means that SkyScene focuses on being adaptable to all memory demands, light, moderate, heavy multitasking and even games, always prioritizing battery savings and consistency. But always respecting the limits of the user's hardware, never going beyond to avoid inconveniences such as OOM, Thrashing and even crashes or PANIC because an app was killed by lmkd by mistake and unbridled push from the user.
 
-## Feature
+## Features
 
 - Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms
 - Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
