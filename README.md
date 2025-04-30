@@ -43,6 +43,7 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
   - 8GB of RAM gets 4GB of ZRAM by default
   - 12GB or more of RAM gets 6GB of ZRAM by default
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
+- For now, dynamic swapping will not be configurable (due to the difficulty of exposing its settings for modification)
 - ZSWAP is not currently supported
 - ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
 - The lmk used for optimization is lmkd minfree and psi, where both are combined. If you have old lmk, or even simple lmk, they will not be optimized, showing no support for them
