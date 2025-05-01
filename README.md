@@ -54,6 +54,13 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 
 Simple, initially my device couldn't handle 6 apps for a long time. So in the Yuki-Chan version (the first one I'll release) I'll try to keep 6 apps active in memory for 30 minutes. And with each version of the module, I'll try to add +2 apps to last 30 minutes. And so on, I'll always try to keep my multitasking stable.
 
+### The dynamic swapping strategy
+
+Dynamic swapping is the main tuning of my module. It is a daemon that dynamically changes these three parameters based on loadavg every 15 seconds:
+- **extra_free_kbytes**: Calls kswapd earlier, as pressure increases, kswapd is called more frequently in a gentle manner, always respecting the system limits and increasing the reclaim as the memory demand requires. This potentially reduces freezes that occur in situations of extreme memory usage.
+- **swappiness**: uses more swap as demand increases, the higher the pressure, the more zram (or hybrid swap) is prioritized. This serves as a way to adapt zram usage based on system needs.
+- **vfs_cache_pressure**: as an additional, frees up "polluted" memory to allow the system to have more memory to meet the system's needs as an attempt to reduce pressure proportionally.
+
 ### 使用解答
 
 Q: 这是什么，是一键全优化吗？  
