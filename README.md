@@ -62,6 +62,8 @@ Dynamic swapping is the main tuning of my module. It is a daemon that dynamicall
 - **swappiness**: uses more swap as demand increases, the higher the pressure, the more zram (or hybrid swap) is prioritized. This serves as a way to adapt zram usage based on system needs.
 - **vfs_cache_pressure**: as an additional, frees up "polluted" memory to allow the system to have more memory to meet the system's needs as an attempt to reduce pressure proportionally.
 
+And don't worry, the daemon is written in C++ and compiled in Clang. So it will use the minimum possible resources and will be able to perform masterfully.
+
 ### 使用解答
 
 Q: 这是什么，是一键全优化吗？  
