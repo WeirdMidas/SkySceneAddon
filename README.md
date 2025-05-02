@@ -15,8 +15,7 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
 - The module achieves the effect of backstage anti-killing by expanding intelligent memory rewriting and modifying the memory management mechanism (lmkd & psi). By combining minfree's thresholds and replacing vmpressure with psi metrics, it makes minfree able to react to abnormal pressure more accurately. And by improving the backend process management, the effect of making the system run more smoothly and saving energy is achieved
 - Prohibits kernel memory recycling threads for 7 cores, avoiding using all cores and reducing priority so they prefer small cores, reducing power consumption by up to 15mW
-- Additional compression in background apps. It is not ZRAM, it is a technique called CompAction. This memory management technique compresses apps that the user is using, if necessary: ​​the compressed app is sent to ZRAM, the app data is double compressed.
-- Each amount of memory has the period and minimum amount of memory that each app uses to compress via CompAction:
+- Additional compression in background apps. It is not ZRAM, it is a technique called CompAction. This memory management technique compresses apps that the user is using, if necessary: ​​the compressed app is sent to ZRAM, the app data is double compressed. Each amount of memory has the period and minimum amount of memory that each app uses to compress via CompAction:
   - 2GB of RAM the app needs to use 32mb to compress. With the compression period occurring every 30 seconds.
   - 3GB of RAM the app needs to use 64mb to compress. With the compression period occurring every 45 seconds.
   - 4GB of RAM the app needs to use 96mb to compress. With the compression period occurring every 45 seconds.
