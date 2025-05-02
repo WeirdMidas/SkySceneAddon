@@ -10,6 +10,20 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 ## ⭐ Features
 
 - Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms
+- Now, when installing the module, the user can choose between lmkd psi, lmkd minfree or lmkd psi + minfree when installing the module. It is not possible to choose another after selecting an lmkd, unless you reinstall the module again.
+  - lmkd psi: Said by Google as the future "main" solution to replace minfree.
+  - Advantages: Psi on supported phones is much more accurate in knowing which apps to kill, when using metrics that look at CPU, MEM and I/O. Based on these metrics, lmkd can choose who to kill to prevent stalls from occurring, making psi almost 2x-10x with fewer false positives.
+  - Weaknesses: It can be much slower to make decisions against OOM or thrashing, and on devices with less memory, if they are not recent/have ROMs that optimize lmkd and its metrics, psi can detect any slight pressure as a potential "stall", killing user apps unnecessarily.
+  - lmkd minfree: Similar to the old lmk, lmkd's minfree uses not just minfree, but minfree + customizable adj. This means that an app has more priority to be killed if it falls into the predefined group.
+  - Advantages: It is much more stable and less prone to OOM and thrashing situations, due to it having predefined limits and being able to react with much less latency to any memory pressure. Allowing the user to avoid suffering from OOM or thrashing much less frequently than with psi.
+  - Disadvantages: unlike psi, minfree has up to 10x more chances of having false positives for any pressure. Making it terrible without being optimized to maintain apps.
+  - lmkd psi + minfree: Combines psi metrics with minfree levels and priorities. This allows lmkd to react to any pressure without depending on vmpressure, making minfree smarter to avoid reacting to any pressure.
+  - Advantages: Combines minfree stability with psi perception, allowing the user the ability to react to almost any pressure because psi already knows the system limits and their priorities due to minfree. It is the combination of minfree's OOM and thrashing security + psi perception.
+  - Disadvantages: Even though it is very advantageous, it takes the weaknesses of both lmkds, the difference is that they "mix" and reduce their weaknesses slightly.
+  - In terms of the advantage between lmkds, here it is in terms of number of open apps:
+lmkd psi > lmkd minfree + psi > lmkd minfree
+  - In terms of security against OOM, Thrashing and freeing up memory to be able to play:
+lmkd minfree > lmkd minfree + psi > lmkd psi.
 - Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
