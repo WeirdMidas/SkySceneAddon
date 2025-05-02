@@ -15,7 +15,6 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
 - The module achieves the effect of backstage anti-killing by expanding intelligent memory rewriting and modifying the memory management mechanism (lmkd & psi). By combining minfree's thresholds and replacing vmpressure with psi metrics, it makes minfree able to react to abnormal pressure more accurately. And by improving the backend process management, the effect of making the system run more smoothly and saving energy is achieved
 - Prohibits kernel memory recycling threads for 7 cores, avoiding using all cores and reducing priority so they prefer small cores, reducing power consumption by up to 15mW
-- Dynamic Swapping focuses on one thing: Scalability, meaning that the swap in general is scalable based on user demand, with it changing three main parameters in a "smooth" way that allows transitions between different pressures. Allowing kswapd to adapt to the system pressure, becoming less or more aggressive based on that. This in general allows the system to easily reclaim memory under different situations, maintaining stability over swap usage and reducing overall power usage in light to moderate demand situations. Great for light to moderate multitasking users, it can be a bit aggressive for heavy multitasking users, but as the module updates, dynamic swapping is improved with new features or improvements to current parameters
 - Every 60 seconds, an additional compression of the applications opened by the user is performed (not involving the one the user is actively using). This does not involve ZRAM, being an additional compression. With this "preliminary" compression, it reduces the memory usage of the apps that are open in the background proportionally, allowing more memory to be kept in the same amount, and, if necessary: ​​sends them to ZRAM, allowing ZRAM to compress the compressed app even more, making it even more efficient by allowing a more "native and clean" compression. This in general, allows more apps to remain in the background, without one of them being killed, and ZRAM will be used more efficiently, and even pulling data from ZRAM to RAM will be faster, the same goes for the swapfile, where already compressed data from the apps will be sent to the swapfile, reducing the overall memory usage. And since it is every 60 seconds, and each amount of memory only compacts specific app weights, CPU will not be used unnecessarily depending on the amount of memory on the device used
 - Introduce hybrid swap! A virtual memory management technique that combines swapfile + zram + ppr, allowing swapping costs to be reduced by up to 27% and still increasing effective memory by 17% even with 1gb of swapfile, It also exponentially reduces writes to storage by allowing a more beneficial swapfile reclaim. As such, it can only be used to its full potential on devices with PPR (per-process reclaim) which are only found on phones with qualcomm processors. And hybrid swap is also required to activate the swapfile (if you use it together with ZRAM), if you do not have a snapdragon processor, hybrid swap can still be used, but only swapfile + zram, excluding ppr from the list (excluding swapping costs, reduced storage degradation and improved effective memory increase)
 - Customizable ZRAM size and compression algorithm(needs kernel support), ranging from 0G to 6G
@@ -44,7 +43,6 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
   - 8GB of RAM gets 4GB of ZRAM by default
   - 12GB or more of RAM gets 6GB of ZRAM by default
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
-- For now, dynamic swapping will not be configurable (due to the difficulty of exposing its settings for modification)
 - ZSWAP is not currently supported
 - ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
 - The lmk used for optimization is lmkd minfree and psi, where both are combined. If you have old lmk, or even simple lmk, they will not be optimized, showing no support for them
@@ -54,15 +52,6 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
 ### How is the module tested for each version?
 
 Simple, initially my device couldn't handle 6 apps for a long time. So in the Yuki-Chan version (the first one I'll release) I'll try to keep 6 apps active in memory for 30 minutes. And with each version of the module, I'll try to add +2 apps to last 30 minutes. And so on, I'll always try to keep my multitasking stable.
-
-### The dynamic swapping strategy
-
-Dynamic swapping is the main tuning of my module. It is a daemon that dynamically changes these three parameters based on loadavg every 15 seconds:
-- **extra_free_kbytes**: Calls kswapd earlier, as pressure increases, kswapd is called more frequently in a gentle manner, always respecting the system limits and increasing the reclaim as the memory demand requires. This potentially reduces freezes that occur in situations of extreme memory usage.
-- **swappiness**: uses more swap as demand increases, the higher the pressure, the more zram (or hybrid swap) is prioritized. This serves as a way to adapt zram usage based on system needs.
-- **vfs_cache_pressure**: as an additional, frees up "polluted" memory to allow the system to have more memory to meet the system's needs as an attempt to reduce pressure proportionally.
-
-And don't worry, the daemon is written in C++ and compiled in Clang. So it will use the minimum possible resources and will be able to perform masterfully.
 
 ### 使用解答
 
