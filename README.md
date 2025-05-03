@@ -51,7 +51,7 @@ lmkd minfree > lmkd minfree + psi > lmkd psi.
 
 - Do not download the module via zip from the repository! Until I know when to send all the files in a single commit, it will be out of date
 - The project is being done more as "personal development", it is not made to be completely public, I only made it public so that when I release my first release I can have some opinion/feedback. Therefore, updates may take time. I am doing everything little by little, I have things to do and personal problems to solve in my personal life, so don't fight me to update things
-- Magisk or KSU
+- When you install the module in magisk or KSU. You will be given the ability to choose between these three lmkd: lmkd minfree + psi (first option), lmkd psi (second option) and lmkd minfree (third option). To choose, press volume down, where when you finish the options, it will return to the beginning. To confirm the choice, just press volume up
 - Install this module and reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the default parameters like ZRAM size, compression algorithm and even enable hybrid swap and swapfile size, and it will take effect after reboot
 - Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot
 - The default ZRAM size is as follows:
