@@ -70,6 +70,14 @@ zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if 
 
 ## FAQ
 
+### Recommendations
+
+If you want a more "ingenious" memory management module than mine, check out lululoid's module
+
+- https://github.com/lululoid/LMKD-PSI-Activator
+
+Certainly if you like lmkd psi, using it instead of mine should be more beneficial, after all it specializes in that.
+
 ### How is the module tested for each version?
 
 Simple, initially my device couldn't handle 6 apps for a long time. So in the Yuki-Chan version (the first one I'll release) I'll try to keep 6 apps active in memory for 30 minutes. And with each version of the module, I'll try to add +2 apps to last 30 minutes. And so on, I'll always try to keep my multitasking stable.
@@ -133,4 +141,4 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @Simple9 --协助诊断在Magisk低于19.0的不兼容问题  
 @〇MH1031 --协助诊断位于/system/bin二进制工具集的不兼容问题  
 @unintellectual-hypothesis -- by hybrid swap and some ZRAM diskzise  
-@lululoid -- extra lmkd adjustments, if you want RAM management totally focused on PSI, it is recommended to use its module (LMKD-PSI-ACTIVATOR) which is more recommended for devices with high-end cell phones that do not want so much "customization"
+@lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly
