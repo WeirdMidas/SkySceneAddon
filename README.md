@@ -65,6 +65,8 @@ lmkd minfree > lmkd minfree + psi > lmkd psi.
 - ZSWAP is not currently supported
 - ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
 - The lmk used for optimization is lmkd minfree and psi, where both are combined. If you have old lmk, or even simple lmk, they will not be optimized, showing no support for them
+- How to see if you are compatible with lmkd psi, write this command in termux with su mode:
+zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if you find together: CONFIG_PSI_FTRACE=y, your lmkd psi has an even higher precision than before.
 
 ## FAQ
 
