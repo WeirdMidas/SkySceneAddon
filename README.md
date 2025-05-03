@@ -43,7 +43,7 @@ lmkd minfree > lmkd minfree + psi > lmkd psi.
 ## Requirement
 
 - ARM64-v8a (64-bit)
-- Magisk or KSU
+- Magisk or KSU Most updated version if possible
 - Android 12-15
 - Have 2GB or more of memory in order to maximize the module's efficiency
 
