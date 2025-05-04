@@ -23,7 +23,9 @@ The goal of SkyScene is to resemble this Chinese module, but adapted for devices
   - In terms of the advantage between lmkds, here it is in terms of number of open apps:
 lmkd psi > lmkd minfree + psi > lmkd minfree
   - In terms of security against OOM, Thrashing and freeing up memory to be able to play:
-lmkd minfree > lmkd minfree + psi > lmkd psi.
+lmkd minfree > lmkd minfree + psi > lmkd psi
+  - In terms of compatibility and likelihood of working more efficiently with devices (android 12+): lmkd minfree > lmkd minfree + psi > lmkd psi
+  - In terms of playing games (in terms of freeing up processes that consume CPU to give everything to the game): lmkd psi > lmkd minfree + psi > lmkd minfree
 - Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
