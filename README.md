@@ -26,6 +26,7 @@ lmkd psi > lmkd minfree + psi > lmkd minfree
 lmkd minfree > lmkd minfree + psi > lmkd psi
   - In terms of compatibility and likelihood of working more efficiently with devices (android 12+): lmkd minfree > lmkd minfree + psi > lmkd psi
   - In terms of playing games (in terms of freeing up processes that consume CPU to give everything to the game): lmkd psi > lmkd minfree + psi > lmkd minfree
+  - **Warning**: The metrics for each lmkd management mod shown are more accurate on newer devices. As the device gets weaker and older, psi can become worse than even minfree and its combined version of the two when it comes to keeping apps open for longer (like in my case).
 - Each lmkd, in addition to one of them being able to be selected as the main one when installing the module, is optimized through an "anti-kill" mechanism, which means that the lmkd used is optimized to avoid killing apps unnecessarily, prioritizing demand and respect for the user. It may not be perfect because I'm just one who is making the module, but it may be useful for other users
 - Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
