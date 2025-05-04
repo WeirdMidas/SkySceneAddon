@@ -81,6 +81,12 @@ zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if 
 
 ## FAQ
 
+### Sources
+
+- [ZRAM Tuning and some other things](https://juejin.cn/post/7147284908367413261)
+- [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md)
+- [Skyscene's original idea & base](https://github.com/yc9559/qti-mem-opt)
+
 ### Recommendations
 
 If you want a more "ingenious" memory management module than mine, check out lululoid's module
