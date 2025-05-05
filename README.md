@@ -87,7 +87,7 @@ zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if 
 - [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md)
 - [Skyscene's base](https://github.com/yc9559/qti-mem-opt)
 - [Studies on lmkd from the official Google page](https://source.android.com/docs/core/perf/lmkd?hl=pt-br)
-- - Some custom roms that have optimized lmkd properly. I won't be able to mention them all since there are a lot of them
+- Some custom roms that have optimized lmkd properly. I won't be able to mention them all since there are a lot of them
 
 ### Recommendations
 
