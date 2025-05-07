@@ -40,8 +40,6 @@ lmkd minfree > lmkd minfree + psi > lmkd psi
   - For 8GB or more, 128 cached/background apps are set instead of the standard 32 for that device.
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
-- It prohibits kernel memory recycling threads running on all cores, but to avoid congestion of the cores that are interacting, it is done through parallelism, which in addition to allowing better use of reclaim by making it faster and more efficient in task management, also reduces energy consumption by improving the scheduler for them
-- Optimizations and improvements to ZRAM that make it a bit better and be used to compress data that is actually useful at the moment, with improvements such avoid swapping memory pages which are hard to compress to ZRAM. Make the lowest compression ratio of ZRAM reach 2.8x, and try to reach default compression levels above 3.1x
 - Additional compression in background apps. It is not ZRAM, it is a technique called CompAction. This memory management technique compresses apps that the user is using, if necessary: ​​the compressed app is sent to ZRAM, the app data is double compressed. Each amount of memory has the period and minimum amount of memory that each app uses to compress via CompAction:
   - 2GB of RAM the app needs to use 32mb to compress. With the compression period occurring every 30 seconds.
   - 3GB of RAM the app needs to use 64mb to compress. With the compression period occurring every 45 seconds.
@@ -50,7 +48,7 @@ lmkd minfree > lmkd minfree + psi > lmkd psi
   - 8GB of RAM the app needs to use 192MB to compress. With the compression period occurring every 90 seconds.
   - 12GB of RAM or more the app needs to use 256MB to compress. With the compression period occurring every 90 seconds.
 - Introduce hybrid swap! A virtual memory management technique that combines swapfile + zram + ppr, allowing swapping costs to be reduced by up to 27% and still increasing effective memory by 17% even with 1gb of swapfile, It also exponentially reduces writes to storage by allowing a more beneficial swapfile reclaim. As such, it can only be used to its full potential on devices with PPR (per-process reclaim) which are only found on phones with qualcomm processors. And hybrid swap is also required to activate the swapfile (if you use it together with ZRAM), if you do not have a snapdragon processor, hybrid swap can still be used, but only swapfile + zram, excluding ppr from the list (excluding swapping costs, reduced storage degradation and improved effective memory increase)
-- Customizable ZRAM size and compression algorithm(needs kernel support), ranging from 0G to 6G
+- Customizable ZRAM size and compression algorithm(needs kernel support), ranging from 0G to 6G. And make the lowest compression ratio of ZRAM reach 2.8x, and try to reach default compression levels above 3.1x
 - Customizable swapfile size (needs hybrid swap active), ranges from 0G to 3G
 - SELinux can still be enabled
 
