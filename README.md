@@ -40,8 +40,7 @@ lmkd minfree > lmkd minfree + psi > lmkd psi
   - For 8GB or more, 128 cached/background apps are set instead of the standard 32 for that device.
 - Customizable list of protected APPs, preventing them from being killed by Android in-userspace lowmemorykiller
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
-- It prohibits memory recycling threads from running on all cores. Making them run on seven cores, but to avoid congestion, the parallelism optimization of kswapd, one of the kernel's memory recyclers, is applied. This allows for a higher memory reclaim throughput of up to ~50%, with swapping costs and congestion probability reduced by up to 15%. In addition, it also results in the probabilities of direct memory allocation being drastically reduced
-- Optimizations and improvements to ZRAM that make it a bit better and be used to compress data that is actually useful at the moment, with improvements such avoid swapping memory pages which are hard to compress to ZRAM. Make the lowest compression ratio of ZRAM reach 2.8x, and try to reach default compression levels above 3.1x
+- Memory Reclaim's performance and throughput are much better compared to what Android's native system has, even on custom ROMs. With features like MGLRU that come with current devices and ROMs, SkyScene also improves kswapd, making it more consistent and stable through parallelism, controlled priority and proper core pinning. All this overall reduces swapping costs by up to -47%, and with improvements in throughput of up to ~50% or more. When combined with Hybrid Swap, the effect is even greater, reaching -74% swapping costs and with throughput of up to ~60% or more
 - Additional compression in background apps. It is not ZRAM, it is a technique called CompAction. This memory management technique compresses apps that the user is using, if necessary: ​​the compressed app is sent to ZRAM, the app data is double compressed. Each amount of memory has the period and minimum amount of memory that each app uses to compress via CompAction:
   - 2GB of RAM the app needs to use 32mb to compress. With the compression period occurring every 30 seconds.
   - 3GB of RAM the app needs to use 64mb to compress. With the compression period occurring every 45 seconds.
@@ -52,6 +51,7 @@ lmkd minfree > lmkd minfree + psi > lmkd psi
 - Introduce hybrid swap! A virtual memory management technique that combines swapfile + zram + ppr, allowing swapping costs to be reduced by up to 27% and still increasing effective memory by 17% even with 1gb of swapfile, It also exponentially reduces writes to storage by allowing a more beneficial swapfile reclaim. As such, it can only be used to its full potential on devices with PPR (per-process reclaim) which are only found on phones with qualcomm processors. And hybrid swap is also required to activate the swapfile (if you use it together with ZRAM), if you do not have a snapdragon processor, hybrid swap can still be used, but only swapfile + zram, excluding ppr from the list (excluding swapping costs, reduced storage degradation and improved effective memory increase)
 - Customizable ZRAM size and compression algorithm(needs kernel support), ranging from 0G to 6G
 - Customizable swapfile size (needs hybrid swap active), ranges from 0G to 3G
+- Make the lowest compression ratio of ZRAM reach 2.8x, and try to reach default compression levels above 3.1x
 - SELinux can still be enabled
 
 ## Requirement
