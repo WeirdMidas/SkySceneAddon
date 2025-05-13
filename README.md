@@ -74,12 +74,14 @@ lmkd minfree > lmkd minfree + psi > lmkd psi
   - 6GB of RAM gets 3GB of ZRAM by default
   - 8GB of RAM gets 4GB of ZRAM by default
   - 12GB or more of RAM gets 6GB of ZRAM by default
+  - ZRAM Dedup is disabled by default because it is completely dependent on the user's workload type
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
 - ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
 - The lmk used for optimization is lmkd minfree and psi, where both are combined. If you have old lmk, or even simple lmk, they will not be optimized, showing no support for them
 - How to see if you are compatible with lmkd psi, write this command in termux with su mode:
 zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if you find together: CONFIG_PSI_FTRACE=y, your lmkd psi has an even higher precision than before.
+- To find out if your kernel has compatibility with ZRAM Dedup, use this command in Termux with su: zcat /proc/config.gz | grep ZRAM, if CONFIG_ZRAM_DEDUP=y appears, it means that your kernel is compatible to use dedup, if this flag does NOT appear with "=y", it means that your kernel does NOT have it, or it is blocked by the kernel because the kernel developers did not want to go ahead with this optimization, leaving it unable to be activated without the user or the dev recompiling the kernel with the flag activated (with "=y")
 
 ## FAQ
 
