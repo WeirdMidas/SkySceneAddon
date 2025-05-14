@@ -101,6 +101,9 @@ If you want a more "ingenious" memory management module than mine, check out lul
 
 Certainly if you like lmkd psi, using it instead of mine should be more beneficial, after all it specializes in that.
 
+### Tips that may be useful
+- For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
+
 ### How is the module tested for each version?
 
 Simple, initially my device couldn't handle 6 apps for a long time. So in the Yuki-Chan version (the first one I'll release) I'll try to keep 6 apps active in memory for 30 minutes. And with each version of the module, I'll try to add +2 apps to last 30 minutes. And so on, I'll always try to keep my multitasking stable.
