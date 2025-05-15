@@ -91,9 +91,11 @@ zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if 
 
 - [ZRAM Tuning and some other things](https://juejin.cn/post/7147284908367413261)
 - [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md)
-- [Skyscene's base](https://github.com/yc9559/qti-mem-opt)
+- [Hybrid Swap Based In Per-Process Reclaim](https://ieeexplore.ieee.org/document/8478216/)
 - [Studies on lmkd from the official Google page](https://source.android.com/docs/core/perf/lmkd?hl=pt-br)
 - Some custom roms that have optimized lmkd properly. I won't be able to mention them all since there are a lot of them
+- Some custom kernels that optimized kswapd and implemented the "kswapd threads" patch. I can't list them all because of the same problem above
+- Tests and more tests with different configurations and in the same tests (multitasking, games, etc.), I spent hours of my days on this
 
 ### Recommendations
 
