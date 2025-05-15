@@ -166,6 +166,7 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @方块白菜 --协助调试在联发科X10平台ZRAM相关功能  
 @Simple9 --协助诊断在Magisk低于19.0的不兼容问题  
 @〇MH1031 --协助诊断位于/system/bin二进制工具集的不兼容问题  
+@yc9559 -- Obvious credits that I forgot to put, SkyScene only exists because of him, the GOAT of the 2018-2020 modules  
 @unintellectual-hypothesis -- by hybrid swap and some ZRAM diskzise  
 @lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly  
 @Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful
