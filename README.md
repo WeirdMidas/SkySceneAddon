@@ -1,5 +1,6 @@
-# SkyScene Addon
-![1000005727](https://github.com/user-attachments/assets/270d5a1f-95ca-40d4-942c-21d62c48f705)
+# SkyScene Add-on
+![1000008969](https://github.com/user-attachments/assets/a91bf922-9a67-40b3-8874-9381461803b0)
+"Sir, we are only offering Wendy's burgers. We do not have McDonald's or Burger King."
 
 ## Modern and user-friendly memory management
 
