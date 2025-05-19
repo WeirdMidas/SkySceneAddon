@@ -117,10 +117,6 @@ If you don't want to use my module or use lululoid's module but want extra manag
 ### Tips that may be useful
 - For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
 
-### How is the module tested for each version?
-
-Simple, initially my device couldn't handle 6 apps for a long time. So in the Yuki-Chan version (the first one I'll release) I'll try to keep 6 apps active in memory for 30 minutes. And with each version of the module, I'll try to add +2 apps to last 30 minutes. And so on, I'll always try to keep my multitasking stable.
-
 ### 使用解答
 
 Q: 这是什么，是一键全优化吗？  
