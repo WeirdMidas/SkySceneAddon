@@ -1,4 +1,4 @@
-# Sky-Scene Addon
+# SkyScene Addon
 ![1000008969](https://github.com/user-attachments/assets/565807d2-bc9c-4f97-bf07-49ec9a3cc025)
 "Sir, we are only offering Wendy's burgers. We do not have McDonald's or Burger King."
 
