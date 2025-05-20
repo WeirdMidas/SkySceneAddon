@@ -84,8 +84,8 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - 12GB or more of RAM gets 6GB of ZRAM by default
   - ZRAM Dedup is disabled by default because it is completely dependent on the user's workload type
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
+  - ZRAM Writeback is supported and currently has no manipulatable size or choice of whether to use it or not, only being unused if ZRAM is enabled. The current writeback size is 3G.
 - ZSWAP is not currently supported
-- ZRAM Writeback is not supported at the moment, and there is a chance that it will not be supported because my device cannot use ZRAM writeback even though it is compatible and has even been compiled into the kernel (if anyone knows how to do this, please help me)
 - The lmk used for optimization in the module are: Old LMK and LMKD. Other LMK are not compatible such as Simple LMK and derivatives
 - How to see if you are compatible with lmkd psi, write this command in termux with su mode:
 zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if you find together: CONFIG_PSI_FTRACE=y, your lmkd psi has an even higher precision than before.
