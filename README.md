@@ -56,9 +56,10 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - 6GB of RAM the app needs to use 128mb to compress. With the compression period occurring every 60 seconds
   - 8GB of RAM the app needs to use 192MB to compress. With the compression period occurring every 90 seconds
   - 12GB of RAM or more the app needs to use 256MB to compress. With the compression period occurring every 90 seconds
+- Optimizations, changes or improvements in memory management for specific platforms/manufacturers. This means that the module also optimizes not only AOSP devices, but also specific ROMs and platforms in their memory management. Currently it is very limited containing only the optimization for Xiaomi to disable or enable Mi_reclaim, but it is a proposal that the module will follow for users who would like specific optimizations for their device instead of just optimizing AOSP parameters.
 - Introduce hybrid swap! A virtual memory management technique that combines swapfile + zram + ppr, allowing swapping costs to be reduced by up to 27% and still increasing effective memory by 17% even with 1gb of swapfile, It also exponentially reduces writes to storage by allowing a more beneficial swapfile reclaim. As such, it can only be used to its full potential on devices with PPR (per-process reclaim) which are only found on phones with qualcomm processors. And hybrid swap is also required to activate the swapfile (if you use it together with ZRAM), if you do not have a snapdragon processor, hybrid swap can still be used, but only swapfile + zram, excluding ppr from the list (excluding swapping costs, reduced storage degradation and improved effective memory increase)
-- Customizable ZRAM size, compression algorithm and whether or not to use ZRAM dedup (needs kernel support) with the ZRAM size ranging from 0G to 6G. And the module will try to have the lowest compression rate of 2.8x, with the attempt to achieve average compression equal to or above the ideal rate of modern Androids of 3.1x
-- Customizable swapfile size (needs hybrid swap active to use with ZRAM), ranges from 0G to 3G
+- Customizable ZRAM size, compression algorithm, whether or not to use ZRAM dedup also added ZRAM Writeback + Writeback Daemon. (needs kernel support) with the ZRAM size ranging from 0G to 6G and the size of the writeback going from 0G to 4G, in addition to other customizations in the daemon such as time to execute the writebacks, wait and how long the daemon sleeps in inactivity in addition to other things.. And the module will try to have the lowest compression rate of 2.8x, with the attempt to achieve average compression equal to or above the ideal rate of modern Androids of 3.1x
+- Customizable swapfile size, ranges from 0G to 3G
 - SELinux can still be enabled
 
 ## Requirement
@@ -83,6 +84,7 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - 8GB of RAM gets 4GB of ZRAM by default
   - 12GB or more of RAM gets 6GB of ZRAM by default
   - ZRAM Dedup is disabled by default because it is completely dependent on the user's workload type
+  - ZRAM Writeback comes in at 0 (i.e. disabled in both options) with the user choosing to enable it and choose whatever size they want
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
 - The lmk used for optimization in the module are: Old LMK and LMKD. Other LMK are not compatible such as Simple LMK and derivatives
@@ -177,7 +179,7 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @Simple9 --协助诊断在Magisk低于19.0的不兼容问题  
 @〇MH1031 --协助诊断位于/system/bin二进制工具集的不兼容问题  
 @yc9559 -- Obvious credits that I forgot to put, SkyScene only exists because of him, the GOAT of the 2018-2020 modules  
-@unintellectual-hypothesis -- by hybrid swap and some ZRAM diskzise  
+@unintellectual-hypothesis -- by hybrid swap, conf_mi_reclaim and some ZRAM diskzise  
 @lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly  
 @Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful  
 @OneB1ank -- Thanks to him for his third-party management module. I don't know how to thank him because I couldn't get in touch with him, so I hope he doesn't get mad at me and understands my use. I give him full credit to the point that I recommend his module in my repository
