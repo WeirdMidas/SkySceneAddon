@@ -83,6 +83,7 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - 12GB or more of RAM gets 6GB of ZRAM by default
   - ZRAM Dedup is disabled by default because it is completely dependent on the user's workload type
   - ZRAM Writeback comes in at 0 (i.e. disabled in both options) with the user choosing to enable it and choose whatever size they want
+  - ZRAM Writeback comes with a writeback daemon that is fully configurable in its functions, with the parameters being available on the panel.
   - Hybrid swap and swapfile in general are set to 0 (i.e. disabled) by default, and the user needs to manually enable them via the panel
 - ZSWAP is not currently supported
 - The lmk used for optimization in the module are: Old LMK and LMKD. Other LMK are not compatible such as Simple LMK and derivatives
