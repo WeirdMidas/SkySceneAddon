@@ -1,7 +1,7 @@
 # SkyScene Add-On
-![1000008969](https://github.com/user-attachments/assets/c9acfd76-dfbe-4ee8-8f87-0d12efe4dca8)
+![1000009558](https://github.com/user-attachments/assets/b15ce9bd-8717-407a-8c92-d3d4fbb56fab)
 
-"Sir, we are only offering Wendy's burgers. We do not have McDonald's or Burger King."
+"I'm trying to break a record to get into the Guinness Book!"
 
 ## Modern and user-friendly memory management
 
