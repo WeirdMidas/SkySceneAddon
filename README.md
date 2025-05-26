@@ -109,7 +109,7 @@ If you don't want to use my module or use lululoid's module but want extra manag
 
 - https://github.com/OneB1ank/A1Memory?tab=readme-ov-file
 
-If you have kernel 5.10 and Android 12-14, you can choose to use [freezeit](https://github.com/jark006/freezeitVS), a module that allows you to automatically freeze processes that the user is not using at the moment. This generally reduces CPU and RAM consumption a little and increases battery life. However, Xposed is required so that the user can use it without some errors such as affecting SElinux.
+If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4, you can choose to use [Cirno](https://github.com/Freezer-Team/Cirno), a "module-app" that freezes processes that the user is not using at the moment/in the recents tab automatically, this will reduce a little the energy consumption and proportionally the RAM consumption. It can be useful to fully control the background processes.
 
 ### Tips that may be useful
 - For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
