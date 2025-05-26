@@ -1,8 +1,7 @@
 # SkyScene Add-On
-![1000009558](https://github.com/user-attachments/assets/b15ce9bd-8717-407a-8c92-d3d4fbb56fab)
+![1000007971](https://github.com/user-attachments/assets/07013c32-24b4-48db-9dbd-c36a49089755)
 
-"I'm trying to break a record to get into the Guinness Book!"
-
+"Guys! Pose for the photo!"
 ## Modern and user-friendly memory management
 
 Memory management optimization for current Android platforms. Optimizing four central aspects: cached processes, battery consumption, memory reclaim and keeping as many applications as possible in the background, of course, respecting the system limits to avoid unnecessary OOM and Thrashing, so my dear user, RESPECT YOUR CELL PHONE!
