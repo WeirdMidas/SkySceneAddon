@@ -116,7 +116,7 @@ If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4 and andr
 ### Tips that may be useful
 - For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
 
-- If you can use the third-party Cirno app-module, I recommend enabling Android's own suspend cached application in the developer options, so you will have almost total control over energy consumption and background memory, in my case I managed to increase battery life by up to +1 hour with this and I also reduced RAM consumption by 100mb (not much, but useful).
+- If you can use the third-party Cirno app-module, I recommend also activating the suspend cached application option in Android's own developer options, so you will have almost total control over energy consumption and background memory. In my case, I managed to increase battery life by up to +1 hour with this and also reduced RAM consumption by 100MB (not much, but useful). This is just by combining the two, one to suspend processes and the other to freeze them.
 
 ### 使用解答
 
