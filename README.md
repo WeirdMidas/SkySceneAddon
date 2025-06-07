@@ -84,6 +84,7 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - ZRAM Writeback comes in at 0 (i.e. disabled in both options) with the user choosing to enable it and choose whatever size they want
   - ZRAM Writeback comes with a writeback daemon that is fully configurable in its functions, with the parameters being available on the panel
   - Swapfile are set to 0 (i.e. disabled) by default, and the user needs to manually enable via the panel
+  - To enable hybrid swap on snapdragon devices, you just need to set a swapfile size and enable PPR and hybrid swap will work as expected
 - ZSWAP is not currently supported
 - The lmk used for optimization in the module are: Old LMK and LMKD. Other LMK are not compatible such as Simple LMK and derivatives
 - How to see if you are compatible with lmkd psi, write this command in termux with su mode:
