@@ -188,4 +188,3 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful  
 @OneB1ank -- Thanks to him for his third-party management module. I don't know how to thank him because I couldn't get in touch with him, so I hope he doesn't get mad at me and understands my use. I give him full credit to the point that I recommend his module in my repository   
 @FreezeTeam Project -- Thanks to them for Cirno. The second additional third-party in my module, I really appreciate it and as a way of rewarding it follows the same dynamic as the others   
-@shadow3aaa -- Thanks for the lmkd hook, without it I wouldn't know where to find a working lmkd hook
