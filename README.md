@@ -4,7 +4,7 @@
 "Guys! Pose for the photo!"
 ## Modern and user-friendly memory management
 
-Memory management optimization for current Android platforms. Optimizing five central aspects: cached processes, use of useful data in page-cache, battery consumption, memory reclaim and keeping as many applications as possible in the background, of course, respecting the system limits to avoid unnecessary OOM and Thrashing, so my dear user, RESPECT YOUR CELL PHONE!
+Memory management optimization for current Android platforms. Optimizing six central aspects: cached processes, use of useful data in page-cache, battery consumption, less potential stalls at high memory usage, memory reclaim and keeping as many applications as possible in the background, of course, respecting the system limits to avoid unnecessary OOM and Thrashing, so my dear user, RESPECT YOUR CELL PHONE!
 
 SkyScene is based on the idea of ​​this module here: https://developer.aliyun.com/article/1230689.
 
@@ -16,7 +16,7 @@ Furthermore, SkyScene combines these aspects, as well as aspects such as: user-f
 
 ## ⭐ Features
 
-- Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms
+- Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms. It also reduces energy consumption proportionally, allowing the user to enjoy better battery life
 - Now when installing the module, you can choose to choose one of the three or four depending on your kernel versions of LMK in the module installation, where you will receive options to choose, at least for Android 10 or higher, where in Android 9 or lower it is fixed in the old LMK, the famous driver LMK. Each LMK below has its advantage in specific, and also dedicated optimizations for each one after the block below:
   - **lmkd psi**: Said by Google as the future "main" solution to replace minfree
   - Advantages: Psi on supported phones is much more accurate in knowing which apps to kill, when using metrics that look at CPU, MEM and I/O. Based on these metrics, lmkd can choose who to kill to prevent stalls from occurring, making psi almost 2x-10x with fewer false positives
@@ -52,6 +52,7 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - For 8GB or more, 128 cached/background apps are set instead of the standard 32 for that device
 - Customizable list of protected APPs, preventing them from being killed by Android lowmemorykiller (both old lmk and lmkd)
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
+- If the device has UFS storage, optimizations are applied that improve memory flushing, reducing memory consumption for unnecessary dirty pages. If it is EMMC, it is the opposite, reducing unnecessary write operations to extend the storage life in exchange for less available memory
 - Memory Reclaim's performance and throughput are much better compared to what Android's native system has, even on custom ROMs. Features like MGLRU that are likely to come in Android 12+ ROMs, SkyScene activates its full version because in these ROMs only a "basic" version is activated, which is significantly inferior to the full version, SkyScene also improves kswapd, making it more consistent and stable through parallelism, controlled priority and proper core pinning. All this overall reduces swapping costs by up to -47%, and with improvements in throughput of up to ~50% or more. If the user is not happy with the default kswapd optimizations, he can customize the various kswapd options via the module panel, allowing the user to adapt the reclaim to his own taste (more throughput, less latency, battery, slower or faster swapping, etc.)
 - Integrated intelligent memory expansion writeback: Every time a specified percentage of used memory is reached, small writes are made until the memory demand is satisfied. If the demand is not satisfied after a while, a large write is made, as a form of debit to try to satisfy the demand completely and prevent the device from entering rebound due to large memory usage. Due to the way it is executed, power consumption only occurs in high memory usage, and due to the way it was compiled, battery consumption is low in checking and executing the writes, only occurring a higher consumption when large writes occur, but the user can customize the execution of the intelligent writeback to their liking completely, such as the percentage at which it should start executing small and large writes, time to start, limits and other more adverse settings
 - This module does not conflict with third-party modules that perform secondary memory management optimizations, AS LONG AS they DO NOT INTERVENE with our optimizations and are secondary and additional optimizations. So much so that the module itself integrates third-party modules that are selected by the author based on quality and that can fully integrate with the module's objective, obviously thanking and giving credit to the original developers. If you meet the requirements of these third-party modules, it is recommended that you use them together with the main one to ensure more effective memory management, control of background processes, reduction of duplicate data and battery saving
@@ -80,9 +81,11 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
   - 6GB of RAM gets 3GB of ZRAM by default
   - 8GB of RAM gets 4GB of ZRAM by default
   - 12GB or more of RAM gets 6GB of ZRAM by default
+  - Default ZRAM algorithm is lz4, user can choose other algorithms that are available on their devices after installation
   - ZRAM Dedup is disabled by default because it is completely dependent on the user's workload type
   - ZRAM Writeback comes in at 0 (i.e. disabled in both options) with the user choosing to enable it and choose whatever size they want
   - ZRAM Writeback comes with a writeback daemon that is fully configurable in its functions, with the parameters being available on the panel
+  - ZRAM Writeback is only recommended for devices with UFS storage. Devices with EMMC storage are not recommended because random latency spikes may occur depending on the situation
   - Swapfile are set to 0 (i.e. disabled) by default, and the user needs to manually enable via the panel
   - To enable hybrid swap on snapdragon devices, you just need to set a swapfile size and enable PPR and hybrid swap will work as expected
 - ZSWAP is not currently supported
@@ -90,7 +93,7 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
 - How to see if you are compatible with lmkd psi, write this command in termux with su mode:
 zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if you find together: CONFIG_PSI_FTRACE=y, your lmkd psi has an even higher precision than before.
 - To find out if your kernel has compatibility with ZRAM Dedup, use this command in Termux with su: zcat /proc/config.gz | grep ZRAM, if CONFIG_ZRAM_DEDUP=y appears, it means that your kernel is compatible to use dedup, if this flag does NOT appear with "=y", it means that your kernel does NOT have it, or it is blocked by the kernel because the kernel developers did not want to go ahead with this optimization, leaving it unable to be activated without the user or the dev recompiling the kernel with the flag activated (with "=y")
-- Specific optimizations based on compatibility. Like UFFD GC for kernels that have it but it is disabled, madvise-random for devices with less than 3GB to reduce page-thrashing in exchange for lower sequential performance. And some that are to avoid adding and resulting in nothing, like MGLRU that can now recognize that the device has MGLRU to apply the flag for all generations
+- Specific optimizations based on compatibility. Like UFFD GC for kernels that have it but it is disabled ans some that are to avoid adding and resulting in nothing, like MGLRU that can now recognize that the device has MGLRU to apply the flag for all generations
 - Only use the second third-party Cirno if you have Freeze Cgroup V2 (usually found in snapdragon kernels 4.19 or higher and in normal kernels 5.4 or higher). And want a recommendation? If you have these requirements, use Cirno, it saved a lot of battery on my cell phone
 
 ## FAQ
@@ -123,6 +126,8 @@ If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4 and andr
 - For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
 
 - If you can use the third-party Cirno app-module, I recommend also activating the suspend cached application option in Android's own developer options, so you will have almost total control over energy consumption and background memory. In my case, I managed to increase battery life by up to +1 hour with this and also reduced RAM consumption by 100MB (not much, but useful). This is just by combining the two, one to suspend processes and the other to freeze them.
+
+- If you have the zstd compression algorithm, only use it in two situations: if you want to hold as much data as possible in memory, for example to last longer in intensive multitasking. Or if you work a lot with processes that use a lot of memory continuously. With the use of the zstd algorithm, in exchange for a higher CPU usage, you get a compression rate almost twice as high as lz4, and if you also use ZRAM Writeback, the data sent to them is reduced, making the writeback file have much more space to be used.
 
 ### 使用解答
 
