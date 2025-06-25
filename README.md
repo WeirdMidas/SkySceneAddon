@@ -129,6 +129,8 @@ If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4 and andr
 
 - If you have the zstd compression algorithm, only use it in two situations: if you want to hold as much data as possible in memory, for example to last longer in intensive multitasking. Or if you work a lot with processes that use a lot of memory continuously. With the use of the zstd algorithm, in exchange for a higher CPU usage, you get a compression rate almost twice as high as lz4, and if you also use ZRAM Writeback, the data sent to them is reduced, making the writeback file have much more space to be used.
 
+- If you are using Cirno and experience some apps freezing in the background, use version 7.0 or later and when activating Cirno (with lsposed and everything), open the Cirno app, click on the app you want to prevent from being frozen, and press the only option above, which means "whitelist", then restart your device. Now the app that is on the specific whitelist will not be frozen because it has been saved on the Cirno whitelist.
+
 ### 使用解答
 
 Q: 这是什么，是一键全优化吗？  
