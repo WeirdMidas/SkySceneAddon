@@ -122,14 +122,24 @@ If you don't want to use my module or use lululoid's module but want extra manag
 
 If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4 and android 12+, you can choose to use [Cirno](https://github.com/Freezer-Team/Cirno), a "module-app" that freezes processes that the user is not using at the moment/in the recents tab automatically, this will reduce a little the energy consumption and proportionally the RAM consumption. It can be useful to fully control the background processes.
 
+### Tips for using Cirno to its full potential
+
+Here are some tips for using Cirno (Freeze Cgroup) to its full potential:
+
+1. ONLY mark apps that you tend to use frequently in the whitelist. Cirno currently has a bug that does not unmark apps from the whitelist, so keep that in mind. Apps that you only use for one function and do not tend to use it together with your multitasking, do not need to be added.
+
+2. Mark your games, preferably all or most of them.
+
+3. To mark apps in the whitelist, after granting all permissions (lsposed, magisk, etc.), click on the app icon and press the toggle option, the translation of it is whitelist, which will put the app in the whitelist. The whitelist will start after reboot. However, there is a bug that makes it impossible to remove an app from the whitelist, but the developer is fixing this.
+
+These tips will be here until the Cirno developer fixes the whitelist bugs. I have left them here only as a recommendation for users who want to use Cirno but may encounter problems.
+
 ### Tips that may be useful
 - For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
 
 - If you can use the third-party Cirno app-module, I recommend also activating the suspend cached application option in Android's own developer options, so you will have almost total control over energy consumption and background memory. In my case, I managed to increase battery life by up to +1 hour with this and also reduced RAM consumption by 100MB (not much, but useful). This is just by combining the two, one to suspend processes and the other to freeze them.
 
 - If you have the zstd compression algorithm, only use it in two situations: if you want to hold as much data as possible in memory, for example to last longer in intensive multitasking. Or if you work a lot with processes that use a lot of memory continuously. With the use of the zstd algorithm, in exchange for a higher CPU usage, you get a compression rate almost twice as high as lz4, and if you also use ZRAM Writeback, the data sent to them is reduced, making the writeback file have much more space to be used.
-
-- If you are using Cirno and experience some apps freezing in the background, use version 7.0 or later and when activating Cirno (with lsposed and everything), open the Cirno app, click on the app you want to prevent from being frozen, and press the only option above, which means "whitelist", then restart your device. Now the app that is on the specific whitelist will not be frozen because it has been saved on the Cirno whitelist.
 
 ### 使用解答
 
