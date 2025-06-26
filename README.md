@@ -150,7 +150,9 @@ These tips will be here until the Cirno developer fixes the whitelist bugs. I ha
 
 ### Random tips that might help
 
-- If you have a 6x2 device (6 small cores and 2 big ones) and want maximum swapping performance while ignoring the energy cost. You can choose to set the affinity to 0-5 and 6 kswapd threads. With this, your kswapd will reach throughput levels that can exceed 60% just in parallelism, if combined with uclamp or schedtune's prefer idle, its own cgroup and other kswapd optimizations, you can reach almost +90% swapping throughput.
+- If you have a 6x2 device (6 small cores and 2 big ones) and want maximum swapping performance while ignoring the energy cost. You can choose to set the affinity to 0-5 and 6 kswapd threads. With this, your kswapd will reach throughput levels that can exceed 60% just in parallelism, if combined with uclamp or schedtune's prefer idle, its own cgroup and other kswapd optimizations, you can reach almost 90% swapping throughput.
+
+- Remember, memory management throughput is not the same thing as saving memory. Swapping throughput, for example, only helps to respond to system pressure faster by avoiding extreme memory spikes more smoothly. In other words, even if you optimize kswapd as much as possible for throughput, you won't have such a drastic improvement in memory management and available memory, but you will have greater survival under peak usage situations.
 
 - If you have the zstd compression algorithm, only use it in two situations: if you want to hold as much data as possible in memory, for example to last longer in intensive multitasking. Or if you work a lot with processes that use a lot of memory continuously. With the use of the zstd algorithm, in exchange for a higher CPU usage, you get a compression rate almost twice as high as lz4, and if you also use ZRAM Writeback, the data sent to them is reduced, making the writeback file have much more space to be used.
 
