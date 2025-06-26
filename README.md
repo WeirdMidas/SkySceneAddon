@@ -122,6 +122,20 @@ If you don't want to use my module or use lululoid's module but want extra manag
 
 If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4 and android 12+, you can choose to use [Cirno](https://github.com/Freezer-Team/Cirno), a "module-app" that freezes processes that the user is not using at the moment/in the recents tab automatically, this will reduce a little the energy consumption and proportionally the RAM consumption. It can be useful to fully control the background processes.
 
+### Tips for imitating some Google-like aspects
+
+If you want to slightly imitate Google's memory management (like Google Pixels), here are some recommendations, follow only those that you find coherent for your management style and performance and energy saving needs:
+
+1. 2 or 4 threads for kswapd. Some Google devices focused on energy saving use 2 threads instead of 4.
+
+2. Use small cores with preference for kswapd. Instead of using cores 0-6 (the module's default), use cores 0-3 or 0-5 (depending on whether your phone is a 4x4 or 6x2). This is because Google prefers to put swapping in the "background" instead of a "proactive" task in freeing up memory.
+
+3. Use lmkd psi + minfree, Google currently uses lmkd with the combination of psi and minfree, even though psi is in theory a "total replacement for minfree". This is because minfree can end up saving the device from OOM situations where lmkd was too slow to save the device.
+
+4. Use the zstd or lz4 algorithm depending on the number of kswapd threads you chose. 4 threads = zstd, 2 threads = lz4. This is because the stronger the algorithm used, the more threads are recommended to avoid congestion, the lighter the algorithm, the fewer threads can perform with less total energy consumption.
+
+5. Keep half of the RAM as ZRAM + Use zram writeback instead of swapfile. Avoids latency spikes and ends up integrating better with ZRAM.
+
 ### Tips for using Cirno to its full potential
 
 Here are some tips for using Cirno (Freeze Cgroup) to its full potential:
@@ -134,10 +148,7 @@ Here are some tips for using Cirno (Freeze Cgroup) to its full potential:
 
 These tips will be here until the Cirno developer fixes the whitelist bugs. I have left them here only as a recommendation for users who want to use Cirno but may encounter problems.
 
-### Tips that may be useful
-- For phones with 6 small cores: If you are using a phone with 6 small cores (a 6x2), you can set affinity for kswapd to run on these cores and add 6 kswapd threads. This way, you can extract the maximum from swapping without even touching the big cores, reducing energy consumption and proportionally improving swap throughput by up to ~60%.
-
-- If you can use the third-party Cirno app-module, I recommend also activating the suspend cached application option in Android's own developer options, so you will have almost total control over energy consumption and background memory. In my case, I managed to increase battery life by up to +1 hour with this and also reduced RAM consumption by 100MB (not much, but useful). This is just by combining the two, one to suspend processes and the other to freeze them.
+### Random tips that might help
 
 - If you have the zstd compression algorithm, only use it in two situations: if you want to hold as much data as possible in memory, for example to last longer in intensive multitasking. Or if you work a lot with processes that use a lot of memory continuously. With the use of the zstd algorithm, in exchange for a higher CPU usage, you get a compression rate almost twice as high as lz4, and if you also use ZRAM Writeback, the data sent to them is reduced, making the writeback file have much more space to be used.
 
