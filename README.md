@@ -4,6 +4,24 @@
 "Guys! Pose for the photo!"
 ## Modern and user-friendly memory management
 
+### Notice
+For users who use my module (Direct Feedback from the author)
+
+I'm redoing SkyScene from scratch.
+
+The reason? Well, I noticed that as the optimizations progressed, I lost efficiency in both energy and multitasking. It got to a point where I thought about giving up on my module, but I decided that I wouldn't give up and continued, redoing it from scratch.
+
+For those who want to know what will be in this "rework" of SkyScene, it's simple:
+
+- Follow lmkd's consistency with Android's dynamics. In other words, use as much memory as possible and eliminate as little as possible, favoring multitasking duration with protection against thrashing and OOM.
+- Scale kswapd's behavior with the scheduler. I'm currently optimizing kswapd and memory reclaim in general to correctly follow the behavior of how the Android scheduler works, which means that kswapd will have less context switching, migration failures and greater freedom in resource allocation. I'll try to do this not by targeting throughput, but rather by targeting latency + swapping costs, which means that kswapd will respond faster to demand and with less active time, reducing the impact on UX.
+- Improve intelligent writeback. I'll try to imitate the behavior of the writeback of the module I proposed to base it on, which means that the writeback will have more optimizations for resource usage and improve response to pressure. It will also have two forms of "huge writeback", which instead of the default one which is every 10 minutes if the demand is not met, will allow the user to use the huge writeback however they want.
+- Make everything more readable, beautiful and friendly for general users, I will try to reduce the "technical" as much as possible and make everything more understandable and without filler language.
+
+Until I release the new version of SkyScene, you can continue using the old versions, they are still functional.
+
+### Once the warning is complete, you can move on
+
 Memory management optimization for current Android platforms. Optimizing five central aspects: 1. efficient reuse of cached processes to minimize reloads, 2. ease the reclaim and make it proactive instead of decisive, balancing pauses and significantly increasing throughput, 3. focus on reducing stalls coming from CPU, MEM and I/O and be consistent with the lmk modernization (LMKD) and if necessary, offer compatibility with old lmk for these changes and lastly: 4. favor multitasking, consider the limits of all devices and allow them to reach this limit, but of course: if the situation gets tight, allow the system to act to avoid serious problems such as OOM, Thrashing and even PANIC. This shows that the module respects the limitations of each device, and encourages the user to do the same, **RESPECT YOUR CELL PHONE!**
 
 SkyScene is based on the idea of ​​this module here: https://developer.aliyun.com/article/1230689.
