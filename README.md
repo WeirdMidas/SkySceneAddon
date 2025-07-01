@@ -4,84 +4,30 @@
 "Guys! Pose for the photo!"
 ## Modern and user-friendly memory management
 
-### Notice
-For users who use my module (Direct Feedback from the author)
-
-I'm redoing SkyScene from scratch.
-
-The reason? Well, I noticed that as the optimizations progressed, I lost efficiency in both energy and multitasking. It got to a point where I thought about giving up on my module, but I decided that I wouldn't give up and continued, redoing it from scratch.
-
-For those who want to know what will be in this "rework" of SkyScene, it's simple:
-
-- Follow lmkd's consistency with Android's dynamics. In other words, use as much memory as possible and eliminate as little as possible, favoring multitasking duration with protection against thrashing and OOM.
-- Scale kswapd's behavior with the scheduler. I'm currently optimizing kswapd and memory reclaim in general to correctly follow the behavior of how the Android scheduler works, which means that kswapd will have less context switching, migration failures and greater freedom in resource allocation. I'll try to do this not by targeting throughput, but rather by targeting latency + swapping costs, which means that kswapd will respond faster to demand and with less active time, reducing the impact on UX.
-- Improve intelligent writeback. I'll try to imitate the behavior of the writeback of the module I proposed to base it on, which means that the writeback will have more optimizations for resource usage and improve response to pressure. It will also have two forms of "huge writeback", which instead of the default one which is every 10 minutes if the demand is not met, will allow the user to use the huge writeback however they want.
-- Make everything more readable, beautiful and friendly for general users, I will try to reduce the "technical" as much as possible and make everything more understandable and without filler language.
-
-Until I release the new version of SkyScene, you can continue using the old versions, they are still functional.
-
-### Once the warning is complete, you can move on
-
-Memory management optimization for current Android platforms. Optimizing five central aspects: 1. efficient reuse of cached processes to minimize reloads, 2. ease the reclaim and make it proactive instead of decisive, balancing pauses and significantly increasing throughput, 3. focus on reducing stalls coming from CPU, MEM and I/O and be consistent with the lmk modernization (LMKD) and if necessary, offer compatibility with old lmk for these changes and lastly: 4. favor multitasking, consider the limits of all devices and allow them to reach this limit, but of course: if the situation gets tight, allow the system to act to avoid serious problems such as OOM, Thrashing and even PANIC. This shows that the module respects the limitations of each device, and encourages the user to do the same, **RESPECT YOUR CELL PHONE!**
-
-SkyScene is based on the idea of ​​this module here: https://developer.aliyun.com/article/1230689.
-
-The goal of SkyScene is to resemble this Chinese module, but adapted for devices that do not use Scene 8 because it is paid, and also for devices with different amounts of memory (2gb or more). This makes SkyScene mimic the power saving and smoothness aspect of the Chinese module mentioned above, but adds an additional layer on top. This additional layer combines aspects such as power saving, smoothness and adaptability to most, if not all, memory demands where the management respects the user, and especially their hardware limits, never going beyond what it is capable of handling, to avoid problems such as OOM, Thrashing and even "Panics" such as some user app being killed because of pushing your limits and not respecting them and generating failures in sequence. In general, SkyScene values ​​a more efficient and adaptable memory management for the user and the hardware of their device in question. Allowing the system to decide when and where to kill apps or compress data with more efficiency and precision. Of course, always respecting limits such as processor, memory, I/O and other limits.
-
-The module is made to have universal compatibility, optimizing the memory management of each device as much as possible, even if it is different, and even adding specific optimizations for the hardware and ROM that the device is located on. This means that the module focuses on only ONE thing: NO PLACEBO! In other words, the module tries to extract the MAXIMUM possible from the memory management that standard Android offers.
-
-Furthermore, SkyScene combines these aspects, as well as aspects such as: user-friendly customization, which means that the user can customize certain module options to allow him to more roughly fit the management to his needs and hardware limits in question. Such as choosing the lmkd management mode when installing the module, customizing ZRAM parameters, using swapfile and other customizable mechanisms that the user wants to change. Even if it is a "light" customization at first, it still allows the user to customize some parameters to his needs.
+Memory management optimization for current Android platforms. SkyScene is based on the idea of ​​this module here: https://developer.aliyun.com/article/1230689.
 
 ## ⭐ Features
 
-- Pure memory management optimization module, not containing other placebo and supporting all mainstream platforms. It also reduces energy consumption proportionally, allowing the user to enjoy better battery life
-- Now when installing the module, you can choose to choose one of the three or four depending on your kernel versions of LMK in the module installation, where you will receive options to choose, at least for Android 10 or higher, where in Android 9 or lower it is fixed in the old LMK, the famous driver LMK. Each LMK below has its advantage in specific, and also dedicated optimizations for each one after the block below:
-  - **lmkd psi**: Said by Google as the future "main" solution to replace minfree
-  - Advantages: Psi on supported phones is much more accurate in knowing which apps to kill, when using metrics that look at CPU, MEM and I/O. Based on these metrics, lmkd can choose who to kill to prevent stalls from occurring, making psi almost 2x-10x with fewer false positives
-  - Weaknesses: It can be much slower to make decisions against OOM or thrashing, and on devices with less memory, if they are not recent/have ROMs that optimize lmkd and its metrics, psi can detect any slight pressure as a potential "stall", killing user apps unnecessarily
-  - **lmkd minfree**: Similar to the old lmk, lmkd's minfree uses not just minfree, but minfree + customizable adj. This means that an app has more priority to be killed if it falls into the predefined group
-  - Advantages: It is much more stable and less prone to OOM and thrashing situations, due to it having predefined limits and being able to react with much less latency to any memory pressure. Allowing the user to avoid suffering from OOM or thrashing much less frequently than with psi
-  - Disadvantages: unlike psi, minfree has up to 10x more chances of having false positives for any pressure. Making it terrible without being optimized to maintain apps
-  - **lmkd psi + minfree**: Combines psi metrics with minfree levels and priorities. This allows lmkd to react to any pressure without depending on vmpressure, making minfree smarter to avoid reacting to any pressure
-  - Advantages: Combines minfree stability with psi perception, allowing the user the ability to react to almost any pressure because psi already knows the system limits and their priorities due to minfree. It is the combination of minfree's OOM and thrashing security + psi perception
-  - Disadvantages: Even though it is very advantageous, it takes the weaknesses of both lmkds, the difference is that they "mix" and reduce their weaknesses slightly
-  - **old lmk**: it's the same as lmkd minfree. The difference is that it's much faster at killing apps and checking memory limits
-  - Advantages: Much more stable and faster against OOM due to being a kernel driver. This generally allows old lmk to respond almost immediately to any memory pressure that exceeds its limits
-  - Disadvantages: Same weaknesses as lmkd minfree, but faster overall and much less "technological", depending on the manufacturer that modified the lmk driver to make it useful
-  - In terms of the advantage between lmks, here it is in terms of number of open apps:
-lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
-  - In terms of security against OOM, Thrashing and freeing up memory to be able to play: old lmk > lmkd minfree > lmkd minfree + psi > lmkd psi
-  - In terms of compatibility and likelihood of working more efficiently with old devices: old lmk and lmkd minfree > lmkd minfree + psi > lmkd psi
-  - In terms of playing games (in terms of freeing up processes that consume CPU to give everything to the game): lmkd psi > lmkd minfree + psi > old lmk > lmkd minfree
-  - **Warning**: The metrics for each lmkd management mod shown are more accurate on newer devices. As the device gets weaker and older, psi can become worse than even minfree and its combined version of the two when it comes to keeping apps open for longer (like in my case)
-- Each lmk (old lmk and three variants of lmkd), in addition to one of them being able to be selected as the main one when installing the module, is optimized through an "anti-kill" mechanism, which means that the lmk used is optimized to avoid killing apps unnecessarily, prioritizing demand and respect for the user, after all, the anti-killing optimizations are based on AOSP/Google, making the tweaks compatible with most devices. If you want to know what the optimizations are for each lmk management mode, see below:
-  - **lmkd psi** (Android 10-12): Due to changes in the lmkd management strategy with the full implementation of the lmkd AOSP tweaks. PSI has been affected, now the killing method that PSI will exercise is: pushing the multitasking limits as much as possible, where the extreme usage and OOM/Thrashing limit has become even higher compared to its sister variants. Lmkd PSI can now push the maximum multitasking limit of the device, and react against stalls in real time. Now lmkd follows its original proposal, eliminating false positives as much as possible and keeping multitasking at its peak while using any free memory, after all "free memory is waste", as some internet users say
-  - **lmkd psi + new strategy** (Android 13+): lmkd psi for new Androids adds an extra property that works only on them. With this property, a PSI management mode is activated, extremely faster, more responsive and slightly more accurate, using ALL memory pressure measurements equally and in cooperation with kernel reclaim to reclaim memory more efficiently. This reduces memory reclaim time by ~40-70%, reduces PSI's impact on the system and even eliminates the 10 second window of standard PSI. This makes PSI able to react to any pressure more accurately and proactively than before, allowing to push the limits of OOM and Thrashing in extreme memory usage a bit further. This form of lowmemorykiller made with PSI becomes the form of management that many might could call it extremely efficient and balanced, compared to kernel implementations that also seek to keep the system under control. The difference is that now PSI can push the limits a little further
-  - **lmkd minfree** (Android 10-12): Now that minfree has become the epitome of stability, if you know the limits of your device, it is useful to use minfree to keep the chances of OOM or Thrashing at a minimum, however, the anti-killing applied in it is done to keep as much data as possible in memory, before triggering immediate killing. Useful for users who rely on the classic lmk implementation and still want to use it on their current devices, such as users with large amounts of memory, etc
-  - **lmkd minfree + new strategy** (Android 13+): Now with the implementation of the new strategy, minfree has become much more accurate and faster in deciding what to kill, now prioritizing keeping processes that the user is currently using "intact", with minfree now being much faster in finishing and choosing which processes will be killed, allowing memory recovery that was previously fast to become much faster
-  - **lmkd minfree + psi** (Android 10-12): Combines the stability behavior of minfree with the responsiveness of psi. You get a "perfect" form of memory management that recognizes the limits of your device, but allows you to react much more accurately to any pressures, where with the increased intelligence of PSI the system is able to react to stalls even more predictably when using the device's memory limits, already knowing its original limits lmkd becomes able to react fully respecting the device and not pushing it beyond what it originally can handle. It is perhaps the most balanced LMKD form for most, and all devices
-  - **lmkd minfree + psi + new strategy** (Android 13+): Combining memory limits aspects with a much more efficient logic. Using all metrics equally, the lmkd combination has become a much more balanced memory management option, outperforming normal implementations thanks to combining the advantages and optimizations of minfree + psi with the new strategy. Making lmkd psi + minfree much more proactive and able to react to more memory usage situations than users would have been able to normally. Finally, this version of minfree + psi can be considered the CLOSEST to ideal behavior for Android devices, always keeping memory free but using it consciously and efficiently
-  - **old lmk**: If the user has old lmk, it will still receive anti-kill improvements. However, unlike the others, it is focused on keeping as much data in RAM as possible, having optimized thresholds and triggers for memory reuse. Unlike the others, even keeping as much memory in use as possible, it is much faster and even efficient against OOM, where when it is close to occurring, old lmk will kill everything that is necessary, avoiding OOM situations faster. Old lmk will also make the limit between extreme use and OOM longer than lmkd minfree
-- In addition, secondary optimizations that benefit lmk were added, such as pinning the reaper thread on big cores to speed up the cleaning of dead processes by up to +50%
-- Solve the problem that the background can't hang even if the free memory is large, by modifying device_config specified ActivityManager CUR_MAX_EMPTY_PROCESSES. With predefined limits for each amount of memory respecting the hardware limits:
-  - For 2GB, 32 cached/background apps are set instead of the standard 24 for that device
-  - For 3-4GB, 64 cached/background apps are set instead of the standard 32 for that device
-  - For 6GB, 96 cached/background apps are set instead of the standard 32 for that device
-  - For 8GB or more, 128 cached/background apps are set instead of the standard 32 for that device
-- Customizable list of protected APPs, preventing them from being killed by Android lowmemorykiller (both old lmk and lmkd)
-- Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
-- If the device has UFS storage, optimizations are applied that improve memory flushing, reducing memory consumption for unnecessary dirty pages. If it is EMMC, it is the opposite, reducing unnecessary write operations to extend the storage life in exchange for less available memory
-- Used zygote prefork to reduce possible CPU and I/O stalls when opening and switching apps in multitasking. Reducing the negative impact of these actions on the system
-- Memory Reclaim's performance and throughput are much better compared to what Android's native system has, even on custom ROMs. Features like MGLRU that are likely to come in Android 12+ ROMs, SkyScene activates its full version because in these ROMs only a "basic" version is activated, which is significantly inferior to the full version, SkyScene also improves kswapd, making it more consistent and stable through parallelism that allows distributing kswapd tasks with less congestion, priority below UX threads and core pinning that allows it to use small cores with more preference than big ones. All this overall reduces swapping costs by up to -43%, and with improvements in throughput of up to ~50% or more. If the user is not happy with the default kswapd optimizations, he can customize the various kswapd options via the module panel, allowing the user to adapt the reclaim to his own taste (more throughput, less latency, battery, slower or faster swapping, etc.)
-- Integrated intelligent memory expansion writeback: Every time a specified percentage of used memory is reached, small writes are made until the memory demand is satisfied. If the demand is not satisfied after a while, a large write is made, as a form of debit to try to satisfy the demand completely and prevent the device from entering rebound due to large memory usage. Due to the way it is executed, power consumption only occurs in high memory usage, and due to the way it was compiled, battery consumption is low in checking and executing the writes, only occurring a higher consumption when large writes occur, but the user can customize the execution of the intelligent writeback to their liking completely, such as the percentage at which it should start executing small and large writes, time to start, limits and other more adverse settings
-- This module does not conflict with third-party modules that perform secondary memory management optimizations, AS LONG AS they DO NOT INTERVENE with our optimizations and are secondary and additional optimizations. So much so that the module itself integrates third-party modules that are selected by the author based on quality and that can fully integrate with the module's objective, obviously thanking and giving credit to the original developers. If you meet the requirements of these third-party modules, it is recommended that you use them together with the main one to ensure more effective memory management, control of background processes, reduction of duplicate data and battery saving
-- Introduces Per-Process Reclaim based on the PRLMK kernel driver. This means that the Hybrid Swap strategy has changed to something more suited to the current system needs and also user references. This means that PPR can now perform well even if the user uses only ZRAM, after all the PPR strategy has changed where it applies proactive reclaim based on "efficiency" that reaches a higher success rate level than Hybrid Swap, reaching +85% average reclaim efficiency. As such, it can only be used on Qualcomm devices and is mainly recommended for devices with 4GB or less, but users with more memory can use it too, if they want more efficiency in the memory usage of their processes
-- Customizable ZRAM, Swapfile and Writeback size. Including the way to choose which compression algorithm to use, whether or not to use ZRAM deduplication and/or additional compression of data that can be sent to ZRAM. It also includes central control over ZRAM usage. All of the functions mentioned require kernel compatibility to allow them to be used. In addition, the sizes of the "virtual memories" follow the style below:
-  - ZRAM goes from 0G to 6G
-  - Swapfile goes from 0G to 3G
-  - Writeback goes from 0G to 8G
-  - Totaling 17GB of virtual memory that the module can offer, with the user being able to choose the sizes he wants. Additionally, the module will try to optimize ZRAM compression to avoid compressing incomprehensible data, and try to achieve the average compression rate of 3.1x which is the modern Android rate, with fallback to rates of 2.8x and so on
-- SELinux can still be enabled
+- The module can avoid background interruption by modifying the memory management mechanism (lmk, psi), providing four optimized forms of these mechanisms that the user can choose when installing the module, as follows:
+  - lmkd psi: Uses the psi form mentioned by Google, making it closer to a 'complete replacement for minfree' as Google tries to integrate it, lmkd psi comes with optimizations that allow it to become more accurate, even on devices with less memory, recognizing thresholds more accurately and respecting the user above all. PSI will work so that it will respect the user's multitasking as much as it can
+  - lmkd minfree: Minfree will work like the classic minfree from old lmk, but with many more thresholds, and even watermark checking is included. As said, lmkd minfree will work in a way that it tries to keep the device out of OOM situations as much as possible, it is like a guard that does not let the client get into too much danger
+  - lmkd minfree + psi: Combining the minfree + psi strategy, with this form of management, it can be said that lmkd comes closest to an "ideal" form of app killing, because it has the protection of minfree with the scalability of psi, allowing the user to have the benefits of both lmkds working simultaneously without leaning towards either side
+  - old lmk: For devices with the old lmk via driver, such as devices with Android below 10. They will also receive optimizations that will be designed to keep as much data in memory as possible, before deciding to kill something. Also included is the ability for the user to choose to use the old lmk or lmkd if they are on Android 10+ and still have the old lmk driver
+- It also includes the differentiation between "lowmem vs high performance" devices, where both vary in their optimizations, which are:
+  - Lowmem: In lowmem devices, LMK becomes more tolerant and relies more on reclaim, where it tends to kill processes based on whether reclaim can save in moments of memory pressure. If it cannot, LMK kills based on how much the system is under pressure, having a critical limit where it kills more aggressively
+  - High Perf: Less tolerant to stalls, if they occur, it tends to kill more aggressively. This difference may be weak with lowmem devices, but due to the larger amount of memory in high perf devices, this type of device ends up relying more on its ability to allocate memory than on "unpredictable things". This means that high perf devices tend to rely more on their amount of memory, allowing it to be used in its entirety
+- And based on improving the management of background processes, we can't forget to optimize kswapd, which is optimized to align with the scheduler, allowing kswapd to respond to demand almost immediately while avoiding migration failures, cache misses, and other penalties. This overall reduces the probability of processes being killed by up to 70%, increasing multitasking dramatically
+- It also includes optimizations on how many background processes the system can allow. Depending on the amount of memory on the device, the number of cached/background processes can scale, following this style:
+  - 2GB can have up to 32 cached/background apps instead of 24
+  - 3GB/4GB can have up to 64 cached/background apps instead of 32
+  - 6GB can have up to 96 cached/background apps instead of 32-64
+  - 8GB or more can have up to 128 cached/background apps instead of 32-64
+- The module provides customizable parameters, among them variable virtual memory sizes such as 0g up to 6g ZRAM, 0g to 3g Swapfile and 0g to 8g Write-back, also includes optimization of VM parameters and customizable compression algorithm selection. Many parameters can be modified in the module panel by yourself, and will take effect after reboot. Pay attention to the comments
+- Built-in inteligent memory extension: perform a small write-back when a used memory threshold is reached, and perform a large write-back only on the lock screen after reaching the number of small write-backs, without any delay or power consumption. Or you can choose to perform a large write-back after reaching the specified number of small write-backs. When the remaining RAM is less than the set threshold, a large write-back will be automatically performed after the screen locks to avoid phone lag
+- Also integrated optimizations in PPR (Per-Process Reclaim) that mimics the behavior of prlmk, this overall allows PPR to be used more efficiently and is less likely to cause drawbacks in user processes, with the cache hit rate being above 85%
+- Includes miscellaneous optimizations. Such as the inclusion of Zygote Prefork to reduce possible CPU and I/O stalls when the device opens or switches apps. Pinning of essential Android libs, to reduce Jank that occurs when system libs are swapped unintentionally. In addition to including adjshield, a way for you to protect your favorite apps (or whatever you want) from the evil lmk that kills them, working for all forms of lmk
+- The module does not get along badly with third-party, on the other hand: It is recommended that you use third-party modules that can help in our way of memory management, of course, if they do not interfere directly with our optimizations, they are always welcome
+- And finally, It also includes keeping SElinux active, of course, it was not tested on all devices, but on my device SElinux remained activated
 
 ## Requirement
 
@@ -92,90 +38,32 @@ lmkd psi > lmkd minfree + psi > lmkd minfree > old lmk
 
 ## Installation
 
-- Do not download the module via zip from the repository! Until I know when to send all the files in a single commit, it will be out of date
-- The project is being done more as "personal development", it is not made to be completely public, I only made it public so that when I release my first release I can have some opinion/feedback. Therefore, updates may take time. I am doing everything little by little, I have things to do and personal problems to solve in my personal life, so don't fight me to update things
-- When installing the module in Magisk Manager or KSU, you will be able to choose between these three lmkd: lmkd psi (volume up), lmkd minfree (volume down) and lmkd minfree + psi (power button). To choose, press the physical buttons as I mentioned above
-- Install this module and reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the default parameters like ZRAM size, compression algorithm and even use swapfile, and it will take effect after reboot
-- Open `/sdcard/Android/panel_adjshield.txt` and add the package name of the APP that needs to be kept in the background. It will take effect after reboot
-- The default ZRAM size and other ZRAM & Swap optimizations are based on AOSP, which means these are the "default" values ​​for each amount of memory:
-  - 2GB of RAM gets 1GB of ZRAM by default
-  - 3GB of RAM gets 1.5GB of ZRAM by default
-  - 4GB of RAM gets 2GB of ZRAM by default
-  - 6GB of RAM gets 3GB of ZRAM by default
-  - 8GB of RAM gets 4GB of ZRAM by default
-  - 12GB or more of RAM gets 6GB of ZRAM by default
-  - Default ZRAM algorithm is lz4, user can choose other algorithms that are available on their devices after installation
-  - ZRAM Dedup is disabled by default because it is completely dependent on the user's workload type
-  - ZRAM Writeback comes in at 0 (i.e. disabled in both options) with the user choosing to enable it and choose whatever size they want
-  - ZRAM Writeback comes with a writeback daemon that is fully configurable in its functions, with the parameters being available on the panel
-  - ZRAM Writeback is only recommended for devices with UFS storage. Devices with EMMC storage are not recommended because random latency spikes may occur depending on the situation
-  - Swapfile are set to 0 (i.e. disabled) by default, and the user needs to manually enable via the panel
-- ZSWAP is not currently supported
-- The lmk used for optimization in the module are: Old LMK and LMKD. Other LMK are not compatible such as Simple LMK and derivatives
-- How to see if you are compatible with lmkd psi, write this command in termux with su mode: zcat /proc/config.gz | grep PSI. If you find CONFIG_PSI, you are compatible, if you find together: CONFIG_PSI_FTRACE=y, your lmkd psi has an even higher precision than before
-- To find out if your kernel has compatibility with ZRAM Dedup, use this command in Termux with su: zcat /proc/config.gz | grep ZRAM, if CONFIG_ZRAM_DEDUP=y appears, it means that your kernel is compatible to use dedup, if this flag does NOT appear with "=y", it means that your kernel does NOT have it, or it is blocked by the kernel because the kernel developers did not want to go ahead with this optimization, leaving it unable to be activated without the user or the dev recompiling the kernel with the flag activated (with "=y")
-- Specific optimizations based on compatibility. Like UFFD GC for kernels that have it but it is disabled and some that are to avoid adding and resulting in nothing, like MGLRU that can now recognize that the device has MGLRU to apply the flag for all generations
-- Only use the second third-party Cirno if you have Freeze Cgroup V2 (usually found in snapdragon kernels 4.19 or higher and in normal kernels 5.4 or higher). And want a recommendation? If you have these requirements, use Cirno, it saved a lot of battery on my cell phone
+- Download the module from the Releases tab, not the zip from the repository. Then install this module, you will be greeted by the ability to choose the lmk you want, follow the instructions and follow the one you would like to use and reboot, there will also be additional optimizations that you are compatible with that will be inserted into your device, don't worry about them and then reboot. 
+- After reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the module parameters, which will take effect after reboot.
+- Open `/sdcard/Android/panel_adjshield.txt` to add the package name of the application that needs to be kept in the background, which will take effect after reboot.
+- The default ZRAM size and other ZRAM & Swap optimizations are based on AOSP, which means these are the "default" values ​​for each amount of memory: 
+  - 2GB of RAM gets 1GB of ZRAM by default.
+  - 3GB of RAM gets 1.5GB of ZRAM by default.
+  - 4GB of RAM gets 2GB of ZRAM by default.
+  - 6GB of RAM gets 3GB of ZRAM by default.
+  - 8GB of RAM gets 4GB of ZRAM by default.
+  - 12GB or more of RAM gets 6GB of ZRAM by default.
+  - Default ZRAM algorithm is lz4.
+  - Onboard memory expansion and Swapfile are disabled by default.
+- ZSWAP is not currently supported.
+- Simple LMK is not currently supported.
 
 ## FAQ
 
 ### Sources
 
-- [ZRAM Tuning and some other things](https://juejin.cn/post/7147284908367413261)
-- [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md)
-- [Per-Process Reclaim based on LMK driver](https://github.com/darkhz/prlmk/tree/README)
-- [Studies on lmkd from the official Google page](https://source.android.com/docs/core/perf/lmkd?hl=pt-br)
-- LMKD optimization are based on AxionOS Custom Rom. Only that with customization and improvements in the optimization they apply by respecting the use of memory in various situations
-- Some custom kernels that optimized kswapd and implemented the "kswapd threads" patch
-- Tests and more tests with different configurations and in the same tests (multitasking, games, etc.), I spent hours of my days on this
-
-### Recommendations
-
-If you want a more "ingenious" memory management module than mine, check out lululoid's module
-
-- https://github.com/lululoid/LMKD-PSI-Activator
-
-Certainly if you like lmkd psi, using it instead of mine should be more beneficial, after all it specializes in that.
-
-If you don't want to use my module or use lululoid's module but want extra management (and you have android 8-14), use OneB1nk's A1Memory, it's just special thanks I can give to him, recommending his project for everyone to see.
-
-- https://github.com/OneB1ank/A1Memory?tab=readme-ov-file
-
-If you have kernel 4.19 (on a Qualcomm/Snapdragon device) or kernel 5.4 and android 12+, you can choose to use [Cirno](https://github.com/Freezer-Team/Cirno), a "module-app" that freezes processes that the user is not using at the moment/in the recents tab automatically, this will reduce a little the energy consumption and proportionally the RAM consumption. It can be useful to fully control the background processes.
-
-### Tips for imitating some Google-like aspects
-
-If you want to slightly imitate Google's memory management (like Google Pixels), here are some recommendations, follow only those that you find coherent for your management style and performance and energy saving needs:
-
-1. 2 or 4 threads for kswapd. Some Google devices focused on energy saving use 2 threads instead of 4.
-
-2. Use small cores with preference for kswapd & kcompactd. Instead of using cores 0-6 (the module's default), use cores 0-3 or 0-5 (depending on whether your phone is a 4x4 or 6x2). This is because Google prefers to put swapping in the "background" instead of a "proactive" task in freeing up memory.
-
-3. Use lmkd psi + minfree, Google currently uses lmkd with the combination of psi and minfree, even though psi is in theory a "total replacement for minfree". This is because minfree can end up saving the device from OOM situations where lmkd was too slow to save the device.
-
-4. Use the zstd or lz4 algorithm depending on the number of kswapd threads you chose. 4 threads = zstd, 2 threads = lz4. This is because the stronger the algorithm used, the more threads are recommended to avoid congestion, the lighter the algorithm, the fewer threads can perform with less total energy consumption.
-
-5. Keep half of the RAM as ZRAM + Use zram writeback instead of swapfile. Avoids latency spikes and ends up integrating better with ZRAM.
-
-### Tips for using Cirno to its full potential
-
-Here are some tips for using Cirno (Freeze Cgroup) to its full potential:
-
-1. ONLY mark apps that you tend to use frequently in the whitelist. Cirno currently has a bug that does not unmark apps from the whitelist, so keep that in mind. Apps that you only use for one function and do not tend to use it together with your multitasking, do not need to be added.
-
-2. Mark your games, preferably all or most of them.
-
-3. To mark apps in the whitelist, after granting all permissions (lsposed, magisk, etc.), click on the app icon and press the toggle option, the translation of it is whitelist, which will put the app in the whitelist. The whitelist will start after reboot. However, there is a bug that makes it impossible to remove an app from the whitelist, but the developer is fixing this.
-
-These tips will be here until the Cirno developer fixes the whitelist bugs. I have left them here only as a recommendation for users who want to use Cirno but may encounter problems.
-
-### Random tips that might help
-
-- If you have a 6x2 device (6 small cores and 2 big ones) and want maximum swapping performance while ignoring the energy cost. You can choose to set the affinity to 6 little cores and 6 kswapd threads. With this, your kswapd will reach throughput levels that can exceed 60% just in parallelism, if combined with uclamp or schedtune's prefer idle, its own cgroup and other kswapd optimizations, you can reach almost 90% swapping throughput.
-
-- Remember, memory management throughput is not the same thing as saving memory. Swapping throughput, for example, only helps to respond to system pressure faster by avoiding extreme memory spikes more smoothly. In other words, even if you optimize kswapd as much as possible for throughput, you won't have such a drastic improvement in memory management and available memory, but you will have greater survival under peak usage situations.
-
-- If you have the zstd compression algorithm, only use it in two situations: if you want to hold as much data as possible in memory, for example to last longer in intensive multitasking. Or if you work a lot with processes that use a lot of memory continuously. With the use of the zstd algorithm, in exchange for a higher CPU usage, you get a compression rate almost twice as high as lz4, and if you also use ZRAM Writeback, the data sent to them is reduced, making the writeback file have much more space to be used.
+- [ZRAM Tuning and some other things](https://juejin.cn/post/7147284908367413261).
+- [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md).
+- [Per-Process Reclaim based on LMK driver](https://github.com/darkhz/prlmk/tree/README).
+- [Studies on lmkd from the official Google page](https://source.android.com/docs/core/perf/lmkd?hl=pt-br).
+- LMKD optimization are based on AxionOS Custom Rom. Only that with customization and improvements in the optimization they apply by respecting the use of memory in various situations.
+- Some descriptions of what Pixel device users have experienced.
+- Tests and more tests with different configurations and in the same tests (multitasking, games, etc.), I spent hours of my days on this.
 
 ### 使用解答
 
@@ -239,5 +127,3 @@ A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对�
 @unintellectual-hypothesis -- by hybrid swap, conf_mi_reclaim and some ZRAM diskzise  
 @lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly  
 @Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful  
-@OneB1ank -- Thanks to him for his third-party management module. I don't know how to thank him because I couldn't get in touch with him, so I hope he doesn't get mad at me and understands my use. I give him full credit to the point that I recommend his module in my repository   
-@FreezeTeam Project -- Thanks to them for Cirno. The second additional third-party in my module, I really appreciate it and as a way of rewarding it follows the same dynamic as the others     
