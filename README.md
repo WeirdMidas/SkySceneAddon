@@ -26,7 +26,7 @@ Memory management optimization for current Android platforms. SkyScene is based 
   - **3GB/4GB** can have up to **64** cached/background apps instead of **32**
   - **6GB** can have up to **96** cached/background apps instead of **32**
   - **8GB** or more can have up to **128** cached/background apps instead of **64**
-- Avoid premature reclaim by using watermark_scale_factor consistent with the amount of memory on the device, which makes reclaim less aggressive and more efficient, causing the user to have an increase of up to ~2x in the number of open processes compared to before, and still with the same or slightly lower memory consumption in multitasking than the user used previously, that is, without a negative impact on the amount of memory available in multitasking without being greater than the user normally used.
+- Avoid premature reclaim by using watermark_scale_factor consistent with the amount of memory on the device, which makes reclaim less aggressive and more efficient, causing the user to have an increase of up to ~2x in the number of open processes compared to before, and still with the same or slightly lower memory consumption in multitasking than the user used previously, that is, without a negative impact on the amount of memory available in multitasking without being greater than the user normally used
   - For **2-3GB** of RAM, it is set to **1**, due to its memory limitations
   - For **4GB** of RAM, it is set to **20**
   - For **6GB** of RAM, it is set to **25**
