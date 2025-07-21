@@ -8,6 +8,7 @@ Memory management optimization for current Android platforms. SkyScene is based 
 
 ## ⭐ Features
 
+- Pure memory management optimization, it does not contain any other placebo or anything that current Androids no longer use or are deprecated or outdated
 - The module can avoid background interruption by modifying the memory management mechanism (lmk, psi), providing four optimized forms of these mechanisms that the user can choose when installing the module, as follows:
   - **lmkd psi**: Uses the psi form mentioned by Google, making it closer to a 'complete replacement for minfree' as Google tries to integrate it, lmkd psi comes with optimizations that allow it to become more accurate, even on devices with less memory, recognizing thresholds more accurately and respecting the user above all. PSI will work so that it will respect the user's multitasking as much as it can
   - **lmkd minfree**: Minfree will work like the classic minfree from old lmk, but with many more thresholds, and even watermark checking is included. As said, lmkd minfree will work in a way that it tries to keep the device out of OOM situations as much as possible, it is like a guard that does not let the client get into too much danger
@@ -33,12 +34,17 @@ Memory management optimization for current Android platforms. SkyScene is based 
   - For **8GB** of RAM, it is set to **30**
   - For **12GB** of RAM or more, it is set to **40**
 - As memory becomes more limited, limitations on graphics and UI are imposed, reducing RAM footprint and CPU/GPU stalls, improving UI fluidity on these limited devices by having less unnecessary rendering/caching. This is applied to low-memory devices (3GB or less) to improve efficiency and available memory. This is not the "low_ram" flag! It allows low-memory devices to still use features they wouldn't normally be able to, something the "low_ram" flag wouldn't naturally allow
+- Avoid wasting memory in certain situations. Modern Android is much more efficient at handling reservations, so avoid granting reservations to users or administrators. While this is only useful on desktop Linux, it's useless on android devices because them already has a dynamic mechanism for this
+- On newer devices, use surfaceflinger cache optimizations that allow for improvements in rendering caching, resulting in improved GPU memory management, reducing wear and tear, and improving UI fluidity
+- Fixes some performance regressions in some memory management subsystems, such as GC. This improves the performance and efficiency of these subsystems
 - The module provides customizable parameters, among them variable virtual memory sizes such as 0g up to 6g ZRAM, 0g to 3g Swapfile and 0g to 8g Write-back, also includes optimization of VM parameters and customizable compression algorithm selection. Many parameters can be modified in the module panel by yourself, and will take effect after reboot. Pay attention to the comments
-- Make the periodic cleanup behavior of dirty data similar to MGLRU even if very limited, favor expiring older data to allow newer and hotter data to be used without being discarded. This favors page-cache at a higher level
-- Built-in inteligent memory extension: perform a small write-back when a used memory threshold is reached, and perform a large write-back only on the lock screen after reaching the number of small write-backs, without any delay or power consumption. Or you can choose to perform a large write-back after reaching the specified number of small write-backs. When the remaining RAM is less than the set threshold, a large write-back will be automatically performed after the screen locks to avoid phone lag
+- Periodically clean up dirty data based on system demand and its capacity to hold it in memory. Rather than being hardcoding or aggressive/generic optimization, this is an optimization that minimizes the impact of dirty data on the system, reduces I/O stalls, unnecessary CPU usage for I/O processing, and improves write batching. This overall reduces memory consumption by having a more efficient reclaim, which also allows for significantly lower idle consumption compared to stock parameters
+- Native use of Cgroup Freezer v2, which Google offers by default on Android devices. This allows for better control over background apps by freezing those that are "invasive" to the user, meaning users don't have to mess with developer options to access it, improving the user experience
+- Built-in inteligent memory extension: perform a small write-back when a used memory threshold is reached, and perform a large write-back only on the lock screen after reaching the number of small write-backs, with a 10 second delay and without power consumption. Or you can choose to perform a large write-back after reaching the specified number of small write-backs. When the remaining RAM is less than the set threshold, a large write-back will be automatically performed after the screen locks to avoid phone lag
 - Also integrated optimizations in PPR (Per-Process Reclaim) that mimics the behavior of prlmk, this overall allows PPR to be used more efficiently and is less likely to cause drawbacks in user processes, with the cache hit rate being above 85%
 - Includes miscellaneous optimizations. Such as the inclusion of Zygote Prefork to reduce possible CPU and I/O stalls when the device opens or switches apps. Always use swap for dexopt and disable minidebuginfo for runtime efficiency. Pinning of essential Android libs, to reduce Jank that occurs when system libs are swapped unintentionally. In addition to including adjshield, a way for you to protect your favorite apps (or whatever you want) from the evil lmk that kills them, working for all forms of lmk
 - The module does not get along badly with third-party, on the other hand: It is recommended that you use third-party modules that can help in our way of memory management, of course, if they do not interfere directly with our optimizations, they are always welcome
+- After all the memory management optimizations, apply the lmkd reset, allowing lmkd to further improve its accuracy when writing to memory the patterns we defined
 - And finally, It also includes keeping SElinux active, of course, it was not tested on all devices, but on my device SElinux remained activated
 
 ## Requirement
@@ -122,6 +128,12 @@ A: 存储在闪存或者磁盘这样外置存储的swapfile，读写延迟比ZRA
 
 Q: 这个跟SimpleLMK哪个好？  
 A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对比更加合适。SimpleLMK触发在直接内存分配，LMK触发在kswapd回收结束之后文件页面缓存低于阈值。SimpleLMK触发较晚，优点在于可以尽可能利用全部内存存放活动的匿名页和文件页面缓存，缺点在于文件页面缓存可能出现极低值造成比较长的停顿。LMK触发较早，优点在于主动地维持文件页面缓存水平不容易造成较长的停顿，缺点在于容易受缓存水平波动导致误清除后台缓存进程。本模块调整了LMK的执行代价，缓解了LMK容易受缓存水平波动的问题。  
+
+Q. When should I use the swapfile or memory expansion? And can I use both?   
+A. Use it only in one situation: you have a low-RAM device and want better multitasking. Conversely, NEVER use the swapfile and memory expansion simultaneously; use only one. And as a recommendation, use memory expansion because it is much less damaging to storage when using idle, unmoving data.
+
+Q. Why should I use ZRAM? Many recommend disabling all swaps.  
+A. Ignore them; disabling ZRAM would lead to much worse performance, even affecting the storage's lifespan. Be aware that ZRAM can improve storage I/O performance by having less data written to the I/O, because ZRAM can already satisfy the memory demand that traditional memory could not. And yes, storage, whether with or without a swapfile, is used to save data, and this is called "Writeback." So much so that desktop users, even with 12GB or more of RAM, report dramatic improvements in responsiveness when using a measly 512MB of ZRAM. So, as a recommendation: if you don't want to use ZRAM, use a measly 512MB just to keep your storage healthy.
 
 ## Credit
 
