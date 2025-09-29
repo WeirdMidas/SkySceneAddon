@@ -29,6 +29,7 @@ A modern memory and I/O management module for Android platforms. A complete focu
 - There are also additional flags that improve the behavior of lmk depending on the version of Android, kernel or ROM, which are:
   - **New Strategy (lmkd + android 13+)**: Uses all metrics equally, prioritizing usability across processes. Based on this, lmkd begins to make decisions with greater accuracy and significantly lower false positives, allowing lmkd to be proactive and adaptive as needed
   - **Page Cache Margin (lmkd)**: The page cache has a margin of 5% of total RAM. In other words, the page cache cannot fall below this value. This allows for better lmkd accuracy depending on the amount of memory and its allocation needs
+  - **Per-app cgroup control (For devices with cgroupv1 + lmkd)**: A way to partially integrate the cgroupv2 intelligence of modern devices into older devices. This allows lmkd and memory recycling threads to have more precision over application memory consumption, improving aspects such as memory compression, etc. This even makes MGLRU and LRU more efficient in this environment
   - **No-batching (old lmk)**: On OnePlus devices or with the most up-to-date LMK driver, they come built-in with "quick decision", but we don't need that, we have more precision by optimizing the LMK driver with a focus on retaining data than using these mechanisms
   - **Use lmk's oom_reaper instead of the VM's (old lmk)**: Prioritize the use of the lmk driver's oom_reaper over the VM subsystem's, allowing heap memory release to be more efficient and consistent with the behavior of these devices
 - Abandon the old hierarchy solution we created. Follow a new proposal for memory management threads. Synchronize all threads, allowing them all to work with the same weight and, in turn, together. Furthermore, improve thread scheduling and ensure that they cannot use prime cores, only small cores (in the case of SOCs with six small cores) or both small and big cores. This eliminates the need for prime cores, avoiding wasted power even on devices with two prime cores, allowing swapping to perform with above-average efficiency
@@ -44,7 +45,7 @@ A modern memory and I/O management module for Android platforms. A complete focu
   - For **8GB** of RAM, it is set to **30**
   - For **12GB** of RAM or more, it is set to **40**
   - For devices with **MGLRU**, it is set to **1**
-- Abandon old solutions like proactive swapping or reactive swapping, which I tried to impose, to try to improve the separation of strategies across different devices by exploiting their advantages. Instead, pursue solutions that, in theory, are more integrated into the kernel, such as MGLRU. Maximize the efficiency of swapping and reclaiming in general, making them less intrusive/invasive and more efficient, reclaiming memory on a larger scale at the lowest possible cost, which drastically reduces I/O and CPU stalls
+- Abandon old swapping solutions such as proactive and reactive swapping. In addition, follow a Separates swapping optimizations between LRU (old and less intelligent) and MGLRU (modern and smarter). As swapping behavior does not change according to Android versions, but the kernel. It becomes easier to optimize to the way the two have been made, allowing the LRU to follow an aggressive strategy that avoids CPU peaks and tries to maintain the maximum of possible memory as possible, and MGLRU follows an efficiency strategy and that the cost of swapping should be the lowest possible, allowing them to extract as much as available
 - Instead of suffering from memory-outage panics, use oom_killer, but not before compacting memory to avoid killing user processes. This reduces the chances of OOM and allows for better survival of background apps, favoring a higher level of stability in memory management than stock parameters can offer. However, there are still limits if memory pressure is so high that compression and oom_kiler fail to save in these situations
 - Integrate complete Android Runtime optimizations to optimize as much as possible the way Android handles compilation itself such as zygote optimizations that compress, create a critical window, and share data with each other for better app launch and ensuring maximum precision for usage profiles, reducing unnecessary I/O and CPU by ensuring optimal time, including choosing optimal GC combinations based on compatibility, such as UFFD + CMC for current devices and CMC (background) and CC (foreground) for not-so-modern devices. It was not integrated into the compilation routine cleaning, this was left to Basic Cleaner, which is one of the recommendations I left at the beginning of the repository
 - A comprehensive set of I/O improvements and optimizations for UFS and eMMC storage devices. These improvements improve I/O bursting, I/O request grouping, separates the needs of the blocks correctly, and read-ahead for dynamic and fstab partitions, reducing power consumption and memory waste, as well as improving latency and throughput, significantly reducing I/O stalls. In addition, it extracts the maximum of CFQ/BFQ schedulers in UFS/EMMC storage that use this, allowing you to reduce the weaknesses of these schedulers, allowing them to be more compatible with Flash storage (SSD) and not follow rigid disk strategies (HDD)
@@ -63,12 +64,14 @@ A modern memory and I/O management module for Android platforms. A complete focu
 - Android 8-15
 - Have 2GB or more of memory in order to maximize the module's efficiency
 - Recommended to use in SOCs with 8 cores, either big.LITTLE or DynamlQ
+- To have modern swapping optimization, it is necessary to have MGLRU
 
 ## Installation
 
 - Download the module from the Releases tab, not the zip from the repository. Then install this module, you will be greeted by the ability to choose the lmk you want, follow the instructions and follow the one you would like to use and reboot, there will also be additional optimizations that you are compatible with that will be inserted into your device, don't worry about them and then reboot. 
 - After reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the module parameters, which will take effect after reboot.
 - Open `/sdcard/Android/panel_adjshield.txt` to add the package name of the application that needs to be kept in the background, which will take effect after reboot.
+- Some panel options only appear if compatibility is confirmed. Avoid using options that are not compatible with modern devices, older devices, other devices, or other privacy/security reasons.
 - The default ZRAM size and other ZRAM & Swap optimizations are based on AOSP, which means these are the "default" values ​​for each amount of memory: 
   - 2GB of RAM gets 1GB of ZRAM by default.
   - 3GB of RAM gets 1.5GB of ZRAM by default.
@@ -81,11 +84,9 @@ A modern memory and I/O management module for Android platforms. A complete focu
   - Onboard memory expansion and Swapfile are disabled by default.
 - ZSWAP is not currently supported.
 - Simple LMK is not currently supported.
-- Full and complete support for MGLRU. This allows MGLRU to work efficiently on modern devices.
 - Abandon CAF solutions for Snapdragon devices and focus on AOSP solutions. Avoid using things that Snapdragon considers best for its processors and allow memory management to be more integrated with the system, going one step further.
-- Lowmem = Devices with 4GB of RAM or less.
-- High Perf = Devices with 6GB of RAM or more.
-- The cell phone that is being tested for optimizations is a lowmem (4gb with 2gb of ZRAM), so I would appreciate it if high perf users reported their tests with the module in issues to see if their background apps are not being negatively impacted due to the "no stall tolerance" rule that I set for high perf devices.
+- Lowmem devices are cell phones or tablets that have 4GB or less of RAM. High Perf Devices are cell phones or tablets that have 6GB or more of RAM.
+- The cell phone that is being tested for optimizations is a lowmem (4gb with 2gb of ZRAM and lz4), so I would appreciate it if high perf users reported their tests with the module in issues to see if their background apps are not being negatively impacted due to the "no stall tolerance" rule that I set for high perf devices.
 
 ## FAQ
 
@@ -174,14 +175,8 @@ A: 存储在闪存或者磁盘这样外置存储的swapfile，读写延迟比ZRA
 Q: 这个跟SimpleLMK哪个好？  
 A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对比更加合适。SimpleLMK触发在直接内存分配，LMK触发在kswapd回收结束之后文件页面缓存低于阈值。SimpleLMK触发较晚，优点在于可以尽可能利用全部内存存放活动的匿名页和文件页面缓存，缺点在于文件页面缓存可能出现极低值造成比较长的停顿。LMK触发较早，优点在于主动地维持文件页面缓存水平不容易造成较长的停顿，缺点在于容易受缓存水平波动导致误清除后台缓存进程。本模块调整了LMK的执行代价，缓解了LMK容易受缓存水平波动的问题。  
 
-Q. Why is swappiness at least 100? Google Pixels use swappiness at 60, for example.   
-A. SkyScene primarily uses ZRAM, a form of compressed swap in memory that is much faster than swapping in storage. Based on this, swappiness is at least 100 because the Android system benefits more from swapping in ZRAM than dropping caches by having a lower swappiness. Even if this costs more battery, Android is smart enough to minimize this battery damage. After all, avoiding swapping in ZRAM reduces CPU consumption very little, around 2% if we reduce swappiness from 100 to 60, for example. The module may still offer the option to use a swapfile, but it is only recommended if users use hybrid swap, which is a combination of ZRAM + Swapfile + PPR, which is only found on Snapdragon devices or those that have ported PPR to kernels from other SoCs.
-
 Q. Kernel devs reported that MGLRU is too aggressive. Why?    
 A. Ignore them. These devs ported an extremely inefficient MGLRU. Many of them even used thrashing prevent, which in an Android environment is extremely inefficient and even degrades MGLRU performance because Android doesn't handle waits well. It is dynamic and needs to be agile and fast to handle memory management.
-
-Q. Why this difference between lowmem and high perf devices?    
-A. The way these devices manage memory is COMPLETELY different. Low-mem devices easily experience memory pressure, so they require proactive swapping and require their LMKD to rely on ZRAM. High-perf devices, on the other hand, don't have these same problems because they only experience memory pressure when performing extreme tasks, far beyond what a low-mem can handle.
 
 Q. Why does SkyScene's Pinner service prioritize what's essential to the system?   
 A. Simple. My Pinner service prioritizes pinning to memory what's truly important to the system and can't be delayed, like certain system_server libs and others. The goal is to minimize stalling of the main system thread by giving it the essential libs it uses for everything from the start.
