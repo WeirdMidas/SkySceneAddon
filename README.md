@@ -13,6 +13,13 @@ A modern memory and I/O management module for Android platforms. A complete focu
 
 ---
 
+
+> [URGENT NOTICE!]
+> Recently, users and developers have reported that several modules corrupted their systems after uninstallation. Like SkyScene, the reason for this is that current root managers are changing their code to something more integrated with the kernel to escape Google Play. The problem is that this has ended up generating horrible bugs, with some modules causing MASSIVE syntax errors when installing/uninstalling! So, if you installed SkyScene and would like to uninstall it, I apologize if your device suffers a bootloop; the problem will no longer be my problem, as it is already beyond what my module could cause.
+
+---
+
+
 ## ⭐ Features
 
 - Pure memory management optimization, it does not contain any other placebo or anything that current Androids no longer use or are deprecated or outdated. Contains only modern optimizations and improvements for recent Android devices, with backward compatibility and optimizations for older devices. Depending on the SOC's memory availability, follow two different strategies for each:
@@ -197,3 +204,4 @@ A. Simple. My Pinner service prioritizes pinning to memory what's truly importan
 @unintellectual-hypothesis -- by hybrid swap, conf_mi_reclaim and some ZRAM diskzise  
 @lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly  
 @Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful  
+
