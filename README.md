@@ -124,7 +124,7 @@ A modern memory and I/O management module for Android platforms. A complete focu
 - Use inteligent writeback as used on Samsung devices, but use writeback values ​​as low as 2GB to 6GB. Above these values, you may have useless "extra space."
 - The same tips (less ZRAM size) for lowmem devices apply to high-perf devices. The difference with inteligent writeback is that a larger spacing between writes/frees is recommended to capture as much idle data as possible and store it. Recommended between 120 seconds (the system's basic reclaim time, synchronizing the two) or every 10 minutes. The longer the time, the less impact on power consumption and the greater the capacity to group idle data to send to storage, which can free up significant ZRAM depending on the situation.
 - If you're a "Google-like" user, set the writeback to be applied every hour, which is Google's recommended standard.
-- If you have the I/O algorithm: mq-deadline, use it, it is one of the MAYBE best I/O algorithms for stock devices (i.e. without extremely optimized kernel).
+- If you have UFS storage and the I/O algorithm "mq-deadline", use this algprithm, it is one of the MAYBE best I/O algorithms for stock devices with UFS Storage (i.e. without extremely optimized kernel).
 
 #### General
 
@@ -207,3 +207,4 @@ A. Simple. My Pinner service prioritizes pinning to memory what's truly importan
 @unintellectual-hypothesis -- by hybrid swap, conf_mi_reclaim and some ZRAM diskzise  
 @lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly  
 @Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful  
+
