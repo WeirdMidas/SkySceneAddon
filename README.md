@@ -1,102 +1,50 @@
-# SkyScene Add-On
-![1000007971](https://github.com/user-attachments/assets/07013c32-24b4-48db-9dbd-c36a49089755)
+# SkyScene Add-on
 
-"The challenge of modernity is to live without illusions, without becoming disillusioned."
-## Modern and user-friendly memory management
+## Modern, LMK-Independent Memory Management
 
-A modern memory management module for Android platforms. A complete focus on modernity and efficiency, with nothing outdated, hacked, tricked, or otherwise inconsistencies due to unfounded dev recommendations. SkyScene is based on the idea of ​​this module here: https://developer.aliyun.com/article/1230689.
+Modern memory management optimization for both legacy and modern devices. Contains strategies to adjust memory behavior for different types and needs between older and modern phones.
 
----
+## Feature
 
-> [RECOMMENDATION!]
-> We recommend using the [Basic Cleaner](https://github.com/WeirdMidas/BasicCleaner) If you want a complete organization and cleaning of your system, along with that, the Android Runtime optimizations will be "complete".
-
----
-
-> [URGENT NOTICE!]
-> Recently, users and developers have reported that several modules corrupted their systems after uninstallation. Like SkyScene, the reason for this is that current root managers are changing their code to something more integrated with the kernel to escape Google Play. The problem is that this has ended up generating horrible bugs, with some modules causing MASSIVE syntax errors when installing/uninstalling! So, if you installed SkyScene and would like to uninstall it, I apologize if your device suffers a bootloop; the problem will no longer be my problem, as it is already beyond what my module could cause.
-
----
-
-## ⭐ Features
-
-- Pure memory management optimization, it does not contain any other placebo or anything that current Androids no longer use or are deprecated or outdated. Contains only modern optimizations and improvements for recent Android devices, with backward compatibility and optimizations for older devices. Depending on the device's memory availability, follow two different strategies for each:
-  - **Lowmem**: Follow the "Free memory is waste, but used unnecessarily is also waste" strategy. Instead of following the "Google-like" behavior, SkyScene aims to make lowmem devices use RAM as efficiently as possible, considering their limitations. They cannot leave unused data in memory; they need space for continuous allocation tasks due to their extreme limitations. Prioritizing multitasking on these devices as much as possible
-  - **High Perf**: Follow the "Google-like" strategy, the famous "free memory is waste." Allowing high-perf devices to extract the maximum from their memory capacity, the only thing they need to worry about is their resource allocation capacity. It prioritizes a balance between multitasking and maximum fluidity
-  - **Both**: Even without scheduling or CPU/GPU optimizations. Prioritize fluidity, stability, and modern energy efficiency for current and legacy devices. Follow Matt Yang's qti-mem-opt proposal and focus on being as fluid as possible even with high memory usage
-- The module can avoid background interruption by modifying the memory management mechanism (lmk, psi), providing four optimized forms of these mechanisms that the user can choose when installing the module, as follows:
-  - **lmkd psi**: Uses the psi form mentioned by Google, making it closer to a 'complete replacement for minfree' as Google tries to integrate it, lmkd psi comes with optimizations that allow it to become more accurate, even on devices with less memory, recognizing thresholds more accurately and respecting the user above all. PSI will work so that it will respect the user's multitasking as much as it can. However, if fluidity is compromised, the PSI will act to resolve the situation as much as possible, always based on whether or not the user's perception of fluidity will be negatively affected
-  - **lmkd minfree**: Minfree will work like the classic minfree from old lmk. As said, lmkd minfree will work in a way that it tries to keep the device out of OOM situations as much as possible, it is like a guard that does not let the client get into too much danger
-  - **lmkd minfree + psi**: An older implementation used on devices that didn't have the most modern PSI possible. With PSI optimizations in more modern devices, the need for minfree has become obsolete, giving more room and space to pure PSI. However, older devices can still benefit from this combination, which, according to the authors, can bring them closer to near-ideal memory management
-  - **old lmk**: For devices with the old lmk via driver, such as devices with Android below 10. They will also receive optimizations that will be designed to keep as much data in memory as possible, before deciding to kill something. Also included is the ability for the user to choose to use the old lmk or lmkd if they are on Android 10+ and still have the old lmk driver
-- Different devices prioritize dynamic killing methods based on their device's limitations and human perception (using psychology studies). As mentioned below:
-  - **Lowmem**: They prefer to have stall tolerance and confidently trust that reclaiming will solve the problem, even in the worst-case scenarios. In human perception, 200ms-400ms of stalling are perceived as acceptable and noticeable, so lmkd lowmem will work within this range. Relying as much as possible on reclaiming prevents the user experience from becoming extremely annoying and unbearable, such as stalls over 500ms
-  - **High perf**: They prefer to have no stall tolerance; their killing method falls within the user's perception of not noticing or noticing stalls. Where high perf devices prefer to kill processes based on whether they have a limit between 100-300ms, and their lmkd will work in that range. Based on this, one might expect high-performance users to prioritize smooth gameplay without any repercussions. After all, high-performance devices typically have to maintain high FPS to please these users
-- There are also additional flags that improve the behavior of lmk depending on the version of Android, kernel or ROM, which are:
-  - **New Strategy (lmkd + android 13+)**: Uses all metrics equally, prioritizing usability across processes. Based on this, lmkd begins to make decisions with greater accuracy and significantly lower false positives, allowing lmkd to be proactive and adaptive as needed
-  - **Page Cache Margin (lmkd)**: The page cache has a margin of 5% of total RAM. In other words, the page cache cannot fall below this value. This allows for better lmkd accuracy depending on the amount of memory and its allocation needs
-  - **Per-app cgroup control (For devices with cgroupv1 + lmkd)**: A way to partially integrate the cgroupv2 intelligence of modern devices into older devices. This allows lmkd and memory recycling threads to have more precision over application memory consumption, improving aspects such as memory compression, etc. This even makes MGLRU and LRU more efficient in this environment
-  - **Dynamic Watermark Boost (lmkd psi + lmkd psi & minfree)**: As memory (RAM + ZRAM) becomes saturated, the need for cleanup becomes increasingly urgent to prevent the device from stalling due to complete RAM and ZRAM saturation. Increase the watermark boost in smaller increments as the saturation increases, minimizing saturation as much as possible by killing the least important processes at the time. This improves multitasking sustainability
-  - **Reset lmkd after all main optimizations (lmkd)**: After integrating all SkyScene optimizations, such as VM, Cgroup, etc. Reset lmkd so that it records the current state of the system and kernel, allowing it to record all pre-made patterns solved by SkyScene
-  - **No-batching (old lmk)**: On OnePlus devices or with the most up-to-date LMK driver, they come built-in with "quick decision", but we don't need that, we have more precision by optimizing the LMK driver with a focus on retaining data than using these mechanisms
-  - **Use lmk's oom_reaper instead of the VM's (old lmk)**: Prioritize the use of the lmk driver's oom_reaper over the VM subsystem's, allowing heap memory release to be more efficient and consistent with the behavior of these devices
-- Abandon the old hierarchy solution we created. Follow a new proposal for memory management threads. Synchronize all threads, allowing them all to work with the same weight and, in turn, together. Furthermore, improve thread scheduling and ensure that they cannot use prime cores, only small cores (in the case of SOCs with six small cores) or both small and big cores. This eliminates the need for prime cores, avoiding wasted power even on devices with two prime cores, allowing swapping to perform with above-average efficiency
-- It also includes optimizations on how many background processes the system can allow. Depending on the amount of memory on the device, the number of cached/background processes can scale, following this style:
-  - **2GB** can have up to **32** cached/background apps instead of **24**
-  - **3GB/4GB** can have up to **64** cached/background apps instead of **32**
-  - **6GB** can have up to **96** cached/background apps instead of **32**
-  - **8GB** or more can have up to **128** cached/background apps instead of **64**
-- On devices without **MGLRU**, avoid premature reclaim by using watermark_scale_factor consistent with the amount of memory on the device, which makes reclaim less aggressive and more efficient, causing the user to have an increase of up to ~2x in the number of open processes compared to before, and still with the same or slightly lower memory consumption in multitasking than the user used previously, that is, without a negative impact on the amount of memory available in multitasking without being greater than the user normally used
-  - For **2-3GB** of RAM, it is set to **1**, due to its memory limitations
-  - For **4GB** of RAM, it is set to **20**
-  - For **6GB** of RAM, it is set to **25**
-  - For **8GB** of RAM, it is set to **30**
-  - For **12GB** of RAM or more, it is set to **40**
-  - For devices with **MGLRU**, it is set to **1**
-- Abandon old swapping solutions such as proactive and reactive swapping. In addition, separates swapping optimizations between LRU (old and less intelligent) and MGLRU (modern and smarter). As swapping behavior does not change according to Android versions, but the kernel. It becomes easier to optimize to the way the two have been made, allowing the LRU to follow an aggressive strategy that avoids CPU peaks and tries to maintain the maximum of possible memory avaliable while avoiding memory fragmentation to prevent ZRAM from saturating, and MGLRU follows an efficiency strategy and that the cost of swapping should be the lowest possible, allowing them to extract as much as available by making less costly decisions in the moment
-  - Offer PPR as a backup reclaim on Snapdragon devices that have it, allowing PPR to better integrate with internal memory management by acting in just one situation: The main management is fragile and needs help! This is where PPR will come in, helping the system as a backup to prevent it from spending additional resources to avoid a crash, minimizing any impact. Useful for users who don't trust their internal memory management and want extra security
-  - Instead of panicking in extremely low memory situations, have the kernel prefer to use oom_killer and kill the most memory-consuming process. Doing this will significantly reduce OOM situations, allowing devices that suffer from constant OOM panics to suffer less from them, resulting in improved stability
-- Integrate complete Android Runtime optimizations to optimize as much as possible the way Android handles compilation itself such as zygote optimizations that compress, create a critical window, and share data with each other with use of image cache for better app launch, and ensuring maximum precision for usage profiles, reducing unnecessary I/O and CPU by ensuring optimal time, including choosing optimal GC combinations based on compatibility, such as UFFD + CMC for current devices and CMC (background) and CC (foreground) for not-so-modern devices. It was not integrated into the compilation routine cleaning, this was left to Basic Cleaner, which is one of the recommendations I left at the beginning of the repository
-- The module provides customizable parameters, among them variable virtual memory sizes such as 0g up to 6g ZRAM, 0g to 3g Swapfile and 0g to 8g Write-back, also customizable compression & I/O algorithm selection, also includes the ability to configure the compression ratio aggressiveness of algorithms like zstd, deflate and lz4hc. Many parameters can be modified in the module panel by yourself, and will take effect after reboot. Pay attention to the comments
-- Built-in inteligent memory extension: perform a small write-back when a used memory threshold is reached, and perform a large write-back only on the lock screen after reaching the number of small write-backs, based on the timer to check memory usage and without power consumption. Or you can choose to perform a large write-back after reaching the specified number of small write-backs. When the remaining RAM is less than the set threshold, a large write-back will be automatically performed after the screen locks to avoid phone lag
-- Includes miscellaneous optimizations. Such as UFS and EMMC storage tweaks to slightly reduce stalls that occur under high memory usage and improve multitasking fluidity. Fix known issues in the Android environment and issues found in modern and old kernels that harm system efficiency. Follow a Pinner Service proposal that pins only what is critical or essential to the system, leaving aside libs that the system can leave for later, with this Pinner Service tactic, jank is minimized by avoiding swapping libs that are critical, improving even the fluidity and opening of apps, incredible as it may seem, in addition to improving the sustainability of multitasking for a longer time. In addition to including adjshield, a way for you to protect your favorite apps (or whatever you want) from the evil lmk that kills them, working for all forms of lmk
-- The module does not get along badly with third-party, on the other hand: It is recommended that you use third-party modules that can help in our way of memory management, of course, if they do not interfere directly with our optimizations, they are always welcome
+- Pure optimization of modern memory management. Contains solutions and optimizations designed primarily to cover all areas of memory management, such as those with traditional or modern swap behavior
+  - Compatibility with all LMK types. SkyScene currently does not optimize or adjust any LMKs, only the kernel's swapping, compaction, and reclaim behavior to a modern and more efficient level
+  - Ensure that various areas of the system are using the most up-to-date format according to Google's guidelines. For example, mlocked follows the CTS standard initially available in Android 14, so that devices that don't comply with modern Android standards can still follow them
+- Solve the problem that the background can't hang even if the free memory is large, by adjusting the activity manager, the module increases the amount of background apps for the following:
+  - 3GB/4GB: Instead of 32 apps in the background, it is increased to 64
+  - 6GB: Instead of 32 apps in the background, it is increased to 96
+  - 8GB or more: Instead of 64 apps in the background, it is increased to 128
+- Customizable list of protected APPs, preventing them from being killed by in-kernel and in-userspace lowmemory killers via adjshield. The user can customize this list of apps as they wish, so be aware of this
+- Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
+- In environments with LRU or MGLRU, apply different optimizations according to their differences and needs. Following these strategies:
+  - For LRU, prioritize aggressive swapping behavior to free up as much space as possible for the page cache and app data, trying to keep as much data as possible in memory regardless of whether the system can handle it or not, prioritizing large-scale mass compression
+  - For MGLRU, be efficient rather than aggressive; prioritize giving MGLRU time to identify pages to swap at its optimal time, avoiding unnecessary overloading of MGLRU. Compared to LRU, MGLRU allows for a difference of almost 37% more data in memory by having only what is truly cold in memory
+  - Prefer and prioritize asynchronous swapping over synchronous swapping. Do this respecting the logic that swapping should be a background memory recycling task, and cannot take resources from foreground tasks to avoid unnecessary resource competition, which could generate additional stalls that are complex to deal with
+  - Offer Per-Process Reclaim as an additional Reclaim, where it is triggered in situations where the device's normal Reclaim does not resolve the situation and needs help, and that's where Per-Process Reclaim comes in and helps the standard reclaim, prioritizing the reclaiming of memory from processes with adj 801 or greater and with the precision varying if the device has MGLRU or LRU
+- It prohibits recycling threads from running on prime cores, running only on big and LITTLE cores, preventing the scheduler from improperly placing these threads on prime cores, wasting energy where these threads could run on big or LITTLE more efficiently, nullifying the impact on energy consumption due to poor scheduling
+- Customizable ZRAM size and algorithm, as well as customizable I/O algorithm, swapfile size, and additional features like the ability to use dedup, choice of how aggressive memory compression is at the expense of speed the algorithms will have (between zstd, deflate and lz4hc) and others. Of course, kernel compatibility is required for all of this. Also, aim for a compression ratio of 3.1x which is ideal for Modern Android, try to avoid dropping below that
 - SELinux can still be enabled
 
 ## Requirement
 
-- ARM64 (64-bit)
-- Magisk, KSU or Apatch Most updated version if possible
-- Android 8-15 (I don't know if my module is compatible with Android 16, but I would like users who use this version to report whether it is compatible or not)
-- Have 2GB or more of memory in order to maximize the module's efficiency
-- Recommended to use in SOCs with 8 cores, either big.LITTLE or DynamlQ
-- May not be compatible with heavily modified/optimized ROMs and kernels. Please be aware of this if you are in these conditions
-- It is recommended that the user have Busybox installed by default. This allows ZRAM to be manipulated with greater precision
-- Disable any "RAM Plus" or options that affect ZRAM/Swap on your device when installing the module. Only leave them enabled if you see that they don't impact SkyScene or generate errors. If you feel like it, use them in conjunction with SkyScene if you want an additional improvement in memory management (if it improves, of course, in some ROMs, certain managers are more harmful than beneficial for multitasking)
+- ARM64, does not include compatibility with standard ARM (32-bit)
+- Magisk, KSU or Apatch, the most up-to-date version possible if you can
+- Android 8 or higher. Not compatible with versions below 8
+- You need at least 3GB of RAM to use it. Modern Android requires this as a minimum amount of RAM
 
 ## Installation
 
-- Download the module from the Releases tab, not the zip from the repository. Then install this module, you will be greeted by the ability to choose the lmk you want, follow the instructions and follow the one you would like to use and reboot, there will also be additional optimizations that you are compatible with that will be inserted into your device, don't worry about them and then reboot. 
-- Recently, users and developers have reported that several modules corrupted their systems after uninstallation. Like SkyScene, the reason for this is that current root managers are changing their code to something more integrated with the kernel to escape Google Play. The problem is that this has ended up generating horrible bugs, with some modules causing MASSIVE syntax errors when installing/uninstalling! So, if you installed SkyScene and would like to uninstall it, I apologize if your device suffers a bootloop; the problem will no longer be my problem, as it is already beyond what my module could cause.
-- After reboot, open `/sdcard/Android/panel_memcfg.txt` to modify the module parameters, which will take effect after reboot.
-- Open `/sdcard/Android/panel_adjshield.txt` to add the package name of the application that needs to be kept in the background, which will take effect after reboot.
-- Some panel options only appear if compatibility is confirmed. Avoid using options that are not compatible with modern devices, older devices, other devices, or other privacy/security reasons.
-- The default ZRAM size and other ZRAM & Swap optimizations are based on AOSP, which means these are the "default" values ​​for each amount of memory: 
-  - 2GB of RAM gets 1GB of ZRAM by default. If the user has MGLRU, the ZRAM size is 1.2GB.
-  - 3GB of RAM gets 1.5GB of ZRAM by default. If the user has MGLRU, the ZRAM size is 2GB.
-  - 4GB of RAM gets 2GB of ZRAM by default. If the user has MGLRU, the ZRAM size is 2.5GB.
-  - 6GB of RAM gets 3GB of ZRAM by default.
-  - 8GB of RAM gets 4GB of ZRAM by default.
-  - 12GB or more of RAM gets 6GB of ZRAM by default.
-  - Default ZRAM algorithm is lz4. All algorithms are supported as long as the user has them in his Kernel. I highly recommend switching to zstd instead of sticking with lz4 for users with high-perf devices and powerful processors. This is because modern high-perf processors benefit MUCH more from storing as much data as possible in ZRAM, as they have enough processing power to do so. Keep the lz4 algorithm only if you need to save maximum CPU or notice lag spikes in games or the UI, but remember that you will notice a noticeable drop in multitasking.
-  - ZRAM Dedup is enabled by default on systems with MGLRU. ZRAM Dedup is disabled by default on LRU systems, with the user being able to choose to keep it disabled or enabled.
-  - Onboard memory expansion and Swapfile are disabled by default.
-- ZSWAP is not currently supported.
-- Simple LMK is not currently supported.
-- Abandon CAF solutions for Snapdragon devices and focus on AOSP solutions. Avoid using things that Snapdragon considers best for its processors and allow memory management to be more integrated with the system, going one step further.
-- The module includes not only modern AOSP optimizations and backward compatibility strategies, but also modern memory management strategies in ROMs from manufacturers such as Xiaomi and others.
-- Lowmem devices are cell phones or tablets that have 4GB or less of RAM. High Perf Devices are cell phones or tablets that have 6GB or more of RAM.
-- The cell phone that is being tested for optimizations is a lowmem (4gb with 2.5gb of ZRAM, lz4 and MGLRU), so I would appreciate it if high perf users reported their tests with the module in issues to see if their background apps are not being negatively impacted due to the "no stall tolerance" rule that I set for high perf devices.
+- Install this module, restart your phone, and open `/sdcard/Android/panel_memcfg.txt` after rebooting to modify the desired ZRAM size and compression algorithm. This will take effect after rebooting.
+- Open `/sdcard/Android/panel_adjshield.txt` to add the package names of the applications you want to keep running in the background. This will take effect after rebooting.
+- The default ZRAM sizes are based on AOSP, which are as follows:
+  - 3GB RAM: 1.5GB ZRAM for LRU and 2.2GB for MGLRU.
+  - 4GB RAM: 2GB ZRAM for LRU and 3GB for MGLRU.
+  - 6GB RAM: 3GB ZRAM for LRU and MGLRU.
+  - 8GB RAM: 4GB ZRAM for LRU and MGLRU.
+  - 12GB or more RAM: 6GB ZRAM for LRU and MGLRU.
+  - The default ZRAM algorithm is lz4. It is recommended for users with cell phones that have good processors to use zstd to have a compression ratio almost three times higher.
+  - Default use of ZRAM Dedup for devices with MGLRU. Disabled by default for devices with LRU.
+- ZSWAP is currently not supported.
+- Support for per-app cgroup. This is added to devices without cgroupv2, allowing devices to have a slightly better cgroup compared to before.
 
 ## FAQ
 
@@ -104,26 +52,10 @@ A modern memory management module for Android platforms. A complete focus on mod
 
 - [ZRAM Tuning and some other things](https://juejin.cn/post/7147284908367413261).
 - [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md)..
-- [Studies on lmkd from the official Google page](https://source.android.com/docs/core/perf/lmkd?hl=pt-br).
 - Some descriptions of what Pixel device users have experienced.
 - Some reports and flags from AOSP master. Core optimizations are almost always based on AOSP itself, prioritizing modernization and efficiency above all else.
-- Studies on human psychology using some channels of curiosities, school facts and some studies on human reflexes and perception.
 - Tests and more tests with different configurations and in the same tests (multitasking, games, etc.), I spent hours of my days on this.
 - And yes, the names of the SkyScene versions are based on the characters from the movie RIO. A movie set in Brazil, my homeland.
-
-### Optimization recommendations based on manufacturer solutions (such as OnePlus, Samsung, Google, etc.)
-
-- If you have little RAM and have LRU but want better multitasking, instead of using the AOSP amount, use the amount used by MGLRU devices:
-- 2GB RAM = 1.2GB ZRAM
-- 3GB RAN = 2GB ZRAM
-- 4GB RAM = 2.5GB ZRAM
-- These values ​​allow a slightly larger margin for these memory amounts, allowing up to 15% more data to be stored in ZRAM compared to the AOSP value. This is achieved using the lz4 compression algorithm, which is used by OnePlus due to its high compression and decompression speeds.
-- For those who want to store as much data as possible in memory, use Aosp or Oneplus ZRAM values, but use the zstd compression algorithm. With zstd, you trade off higher CPU usage, slower compression and decompression speeds and possible stalls at high memory usage (around 80-85% ZRAM usage), with the amount of compressed data double or even triple compared to lz4, however, don't follow this idea if you have a weak processor, have at least one that is minimally competent, because zstd can be a bit problematic on these weaker processors.
-- Use inteligent writeback as used on Samsung devices, but use writeback values ​​as low as 2GB to 6GB. Above these values, you may have useless "extra space."
-- The same tips (less ZRAM size) for lowmem devices apply to high-perf devices. The difference with inteligent writeback is that a larger spacing between writes/frees is recommended to capture as much idle data as possible and store it. Recommended between 120 seconds (the system's basic reclaim time, synchronizing the two) or every 10 minutes. The longer the time, the less impact on power consumption and the greater the capacity to group idle data to send to storage, which can free up significant ZRAM depending on the situation.
-- If you're a "Google-like" user, set the writeback to be applied every hour, which is Google's recommended standard.
-- If you have UFS storage and the I/O algorithm "mq-deadline", use this algprithm, it is one of the MAYBE best I/O algorithms for stock devices with UFS Storage (i.e. without extremely optimized kernel).
-- Due to the way SkyScene was previously built, your device may experience cache overflow more quickly when installing or updating SkyScene repeatedly. This has been partially fixed in more recent versions, but these annoying situations still occur. To completely fix this, the only and main recommendation is to format the device. This way, SkyScene can extract the maximum memory management from your device without cache penalties.
 
 ### 使用解答
 
@@ -151,15 +83,6 @@ A: 物理内存资源是有限的，不可能满足无限的后台缓存需求�
 Q: 为什么耗电变多了？  
 A: 缓存进程本身是不增加耗电的，更多的页面交换增加的耗电十分有限。需要注意的是保活更多后台APP的同时，这些APP并非全都处于缓存休眠的状态，可能有不少服务在后台运行消耗电量。  
 
-Q. When should I use the swapfile or memory expansion? And can I use both?   
-A. Use it only in one situation: you have a low-RAM device and want better multitasking. Conversely, NEVER use the swapfile and memory expansion simultaneously; use only one. And as a recommendation, use memory expansion because it is much less damaging to storage when using idle, unmoving data.
-
-Q. Why should I use ZRAM? Many recommend disabling all swaps.  
-A. Ignore them; disabling ZRAM would lead to much worse performance, even affecting the storage's lifespan. Be aware that ZRAM can improve storage I/O performance by having less data written to the I/O, because ZRAM can already satisfy the memory demand that traditional memory could not. And yes, storage, whether with or without a swapfile, is used to save data, and this is called "Writeback." So much so that desktop users, even with 12GB or more of RAM, report dramatic improvements in responsiveness when using a measly 512MB of ZRAM. So, as a recommendation: if you don't want to use ZRAM, use a measly 512MB just to keep your storage healthy.
-
-Q. Why do modern high-performance devices use the zstd algorithm instead of lz4? Why is lz4 recommended for low-mem devices and older high-performance devices?
-A. Simple. In the past, most processors were too weak to handle all system tasks, so using algorithms like zstd, which consumed an absurd amount of CPU at the time, wasn't worth it. However, with modern processors today, zstd has become an increasingly viable and plausible option. Samsung's SDM 700 and 800 series processors started using this algorithm instead of lz4, allowing for a dramatic increase in multitasking on these more modern devices. So, a basic recommendation: if you have a powerful processor and 6GB or more of RAM, use the zstd algorithm; your multitasking will be IMMENSELY grateful.
-
 ### 技术解答
 
 Q: `CUR_MAX_EMPTY_PROCESSES`这一限制是什么？  
@@ -180,12 +103,6 @@ A: 存储在闪存或者磁盘这样外置存储的swapfile，读写延迟比ZRA
 Q: 这个跟SimpleLMK哪个好？  
 A: 把Magisk模块跟内核模块对比是不合适的，把SimpleLMK跟LMK对比更加合适。SimpleLMK触发在直接内存分配，LMK触发在kswapd回收结束之后文件页面缓存低于阈值。SimpleLMK触发较晚，优点在于可以尽可能利用全部内存存放活动的匿名页和文件页面缓存，缺点在于文件页面缓存可能出现极低值造成比较长的停顿。LMK触发较早，优点在于主动地维持文件页面缓存水平不容易造成较长的停顿，缺点在于容易受缓存水平波动导致误清除后台缓存进程。本模块调整了LMK的执行代价，缓解了LMK容易受缓存水平波动的问题。  
 
-Q. Kernel devs reported that MGLRU is too aggressive. Why?    
-A. Ignore them. These devs ported an extremely inefficient MGLRU. Many of them even used thrashing prevent, which in an Android environment is extremely inefficient and even degrades MGLRU performance because Android doesn't handle waits well. It is dynamic and needs to be agile and fast to handle memory management.
-
-Q. Why does SkyScene's Pinner service prioritize what's essential to the system?   
-A. Simple. My Pinner service prioritizes pinning to memory what's truly important to the system and can't be delayed, like certain system_server libs and others. The goal is to minimize stalling of the main system thread by giving it the essential libs it uses for everything from the start.
-
 ## Credit
 
 @Doug Hoyte  
@@ -199,6 +116,5 @@ A. Simple. My Pinner service prioritizes pinning to memory what's truly importan
 @Simple9 --协助诊断在Magisk低于19.0的不兼容问题  
 @〇MH1031 --协助诊断位于/system/bin二进制工具集的不兼容问题  
 @yc9559 -- Obvious credits that I forgot to put, SkyScene only exists because of him, the GOAT of the 2018-2020 modules  
-@unintellectual-hypothesis -- by hybrid swap, conf_mi_reclaim and some ZRAM diskzise  
-@lululoid -- I am very grateful for the customize.sh functions that allowed me the ability to change lmkd during installation, because of that I will recommend its module in my repository as a way to help you and thank you indirectly  
-@Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful  
+@unintellectual-hypothesis -- by hybrid swap, conf_mi_reclaim and some ZRAM diskzise    
+@Iamlooper -- For the magisk MMT Reborn template. Thanks to the template, I was able to replace the old qti-mem-opt template and keep all the features without extra additions! Also now the cpu usage of the module has reduced by 2%, little but useful
