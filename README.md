@@ -6,21 +6,26 @@ Modern memory management optimization for both legacy and modern devices. Contai
 
 ## Feature
 
-- Pure optimization of modern memory management. Contains solutions and optimizations designed primarily to cover all areas of memory management, such as those with traditional or modern swap behavior
-  - Compatibility with all LMK types. SkyScene currently does not optimize or adjust any LMKs, only the kernel's swapping, compaction, and reclaim behavior to a modern and more efficient level
+- Pure optimization of modern memory management. Contains solutions and optimizations designed primarily to cover all kernel memory management areas, such as those with traditional or modern swap behavior
+  - Compatibility with all LMK types. SkyScene currently does DOES NOT INCLUDE: ART, GC, LMK, and other optimizations. This means we'll optimize all kernel memory management, such as swapping, compaction, reclaim, mlocked, and others. MAYBE including userspace optimizations, but that's not a guarantee
   - Ensure that various areas of the system are using the most up-to-date format according to Google's guidelines. For example, mlocked follows the CTS standard initially available in Android 14, so that devices that don't comply with modern Android standards can still follow them
 - Solve the problem that the background can't hang even if the free memory is large, by adjusting the activity manager, the module increases the amount of background apps for the following:
   - 3GB/4GB: Instead of 32 apps in the background, it is increased to 64
   - 6GB: Instead of 32 apps in the background, it is increased to 96
   - 8GB or more: Instead of 64 apps in the background, it is increased to 128
 - Customizable list of protected APPs, preventing them from being killed by in-kernel and in-userspace lowmemory killers via adjshield. The user can customize this list of apps as they wish, so be aware of this
-- Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
+- Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations, in addition to slightly improving page-cache cache accuracy, by retaining data that is actually useful at the moment in memory whenever the system or application needs it
+  - As the amount of available memory for SkyScene to use increases, pin more files that are extremely useful for latency, such as the launcher, keyboard, and critical camera libs (not the camera app itself), allowing high-perf devices to benefit from the lower latency of fast access
+- As a precaution, prevent dirty pages from causing noticeable system stalls. Allow more data to remain in memory, and when needed, send it to storage. This reduces the stalls that occur at certain points in the system proportionally
 - In environments with LRU or MGLRU, apply different optimizations according to their differences and needs. Following these strategies:
   - For LRU, prioritize aggressive swapping behavior to free up as much space as possible for the page cache and app data, trying to keep as much data as possible in memory regardless of whether the system can handle it or not, prioritizing large-scale mass compression
-  - For MGLRU, be efficient rather than aggressive; prioritize giving MGLRU time to identify pages to swap at its optimal time, avoiding unnecessary overloading of MGLRU. Compared to LRU, MGLRU allows for a difference of almost 37% more data in memory by having only what is truly cold in memory
+  - For MGLRU, be efficient rather than aggressive; prioritize giving MGLRU time to identify pages to swap at its optimal time, avoiding unnecessary overloading of MGLRU. Compared to LRU, MGLRU allows for a difference of almost 37% more data in memory by having only what is truly cold or hot in memory
+    - Based on the device's memory capacity, scale MGLRU's need for swapping. This allows each device to have swapping that scales with its memory capacity, rather than a Google-defined default
   - Prefer and prioritize asynchronous swapping over synchronous swapping. Do this respecting the logic that swapping should be a background memory recycling task, and cannot take resources from foreground tasks to avoid unnecessary resource competition, which could generate additional stalls that are complex to deal with
+    - Make swapping a background task, following the logic that kswapd needs to be as efficient as possible, reducing the impact of powerful algorithms on the CPU, allowing for better swapping efficiency
   - Offer Per-Process Reclaim as an additional Reclaim, where it is triggered in situations where the device's normal Reclaim does not resolve the situation and needs help, and that's where Per-Process Reclaim comes in and helps the standard reclaim, prioritizing the reclaiming of memory from processes with adj 801 or greater and with the precision varying if the device has MGLRU or LRU
 - It prohibits recycling threads from running on prime cores, running only on big and LITTLE cores, preventing the scheduler from improperly placing these threads on prime cores, wasting energy where these threads could run on big or LITTLE more efficiently, nullifying the impact on energy consumption due to poor scheduling
+- Compact memory more often, even if the memory allocation was estimated to be due to a low-memory status. This lets us put more data into RAM at the expense of running compation more often. This is a worthy tradeoff, as it reduces memory fragmentation, which is incredibly important for ZRAM 
 - Customizable ZRAM size and algorithm, as well as customizable I/O algorithm, swapfile size, and additional features like the ability to use dedup, choice of how aggressive memory compression is at the expense of speed the algorithms will have (between zstd, deflate and lz4hc) and others. Of course, kernel compatibility is required for all of this. Also, aim for a compression ratio of 3.1x which is ideal for Modern Android, try to avoid dropping below that
 - SELinux can still be enabled
 
@@ -42,7 +47,7 @@ Modern memory management optimization for both legacy and modern devices. Contai
   - 8GB RAM: 4GB ZRAM for LRU and MGLRU.
   - 12GB or more RAM: 6GB ZRAM for LRU and MGLRU.
   - The default ZRAM algorithm is lz4. It is recommended for users with cell phones that have good processors to use zstd to have a compression ratio almost three times higher.
-  - Default use of ZRAM Dedup for devices with MGLRU. Disabled by default for devices with LRU.
+  - ZRAM Dedup is enabled by default on devices with MGLRU. Disabled by default for devices with LRU.
 - ZSWAP is currently not supported.
 - Support for per-app cgroup. This is added to devices without cgroupv2, allowing devices to have a slightly better cgroup compared to before.
 
@@ -51,8 +56,9 @@ Modern memory management optimization for both legacy and modern devices. Contai
 ### Sources
 
 - [ZRAM Tuning and some other things](https://juejin.cn/post/7147284908367413261).
-- [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md)..
+- [Cached and Phantom Process](https://github.com/agnostic-apollo/Android-Docs/blob/master/en/docs/apps/processes/phantom-cached-and-empty-processes.md).
 - Some descriptions of what Pixel device users have experienced.
+- Some parameters that Tytydraco explained in his Ktweak on XDA.
 - Some reports and flags from AOSP master. Core optimizations are almost always based on AOSP itself, prioritizing modernization and efficiency above all else.
 - Tests and more tests with different configurations and in the same tests (multitasking, games, etc.), I spent hours of my days on this.
 - And yes, the names of the SkyScene versions are based on the characters from the movie RIO. A movie set in Brazil, my homeland.
