@@ -8,28 +8,31 @@ Modern memory management optimization for both legacy and modern devices. Contai
 
 - Pure optimization of modern memory management. Contains solutions and optimizations designed primarily to cover all kernel memory management areas, such as those with traditional or modern swap behavior
   - Compatibility with all LMK types. SkyScene currently does DOES NOT INCLUDE: ART, GC, LMK, and other optimizations. This means we'll optimize all kernel memory management, such as swapping, compaction, reclaim, mlocked, and it attempts to resolve issues with memory fragmentation, which can impair long-term multitasking, and thrashing from excessive data exchange between ZRAM and RAM. MAYBE including userspace optimizations, but that's not a guarantee
-  - Ensure that various areas of the system are using the most up-to-date format according to Google's guidelines. For example, mlocked follows the CTS standard initially available in Android 14 and Zygote Prefork for faster app launch and less initial structural and memory fragmentation. By implementing these "system health" improvements, which may not be present in all ROMs, the device performs slightly better in terms of fluidity and memory management
+  - Ensure that various areas of the system are using the most up-to-date format according to Google's guidelines. For example, mlocked follows the CTS standard initially available in Android 14 and some Zygote functions recommended by Google. By implementing these "system health" improvements, which may not be present in all ROMs, the device performs slightly better in terms of managing resources
 - Solve the problem that the background can't hang even if the free memory is large, by adjusting the activity manager, the module increases the amount of background apps for the following:
   - **1GB/2GB**: Instead of **24** apps in the background, it is increased to **32**
   - **3GB/4GB**: Instead of **32** apps in the background, it is increased to **64**
   - **6GB**: Instead of **32** apps in the background, it is increased to **96**
   - **8GB** or more: Instead of **64** apps in the background, it is increased to **128**
+  - If the user has a device with a Snapdragon processor, modifications directly to the QTI Framework to change the activity manager are implemented, allowing an increase in the number of background processes based on the SOC hardware. This creates a better compatibility layer than modifying via the standard Android activity manager, which is a higher layer
 - Customizable list of protected APPs, preventing them from being killed by in-kernel and in-userspace lowmemory killers via adjshield. The user can customize this list of apps as they wish, so be aware of this
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations. However, unlike Matt Yang's method, it is aligned with Google Pixel for better alignment
-- Improve the I/O behavior of UFS and EMMC storage. Prevent UFS storage from being impacted by unwanted latency spikes at inopportune times, allowing for smoother and more consistent I/O
+- Aim for predictable memory management behavior, preferring to avoid OOM (Out of Memory) in more predictable ways rather than abruptly wiping everything out or restarting the device unexpectedly
+- Make the I/O experience more user-friendly; choose the best algorithm between noop, none or mq-deadline for UFS storage; avoid using algorithms designed for hard drives. Slightly improve the usability and health of the eMMC so that devices using it don't suffer from its excessively poor performance
+- Align key maintenance tasks (statistics, cp interval, and dirty data expiration) into a single event. This improves energy efficiency and system predictability, reduces the impact of intermittent wakeups, and enables the CPU to maintain lower, deeper C-states
 - According to the swapping algorithm coupled to the device kernel, there will be differences in the optimization style and techniques used for each, prioritizing covering their weaknesses and advantages in diverse areas without so many drawbacks:
   - **LRU**: Aim for the most aggressive balance between memory compression and cold data swapper. Even though it's a "brute force" strategy, it's necessary because the way LRU thinks is dumb and stupid, forcing it to be aggressive to avoid bigger problems
     - Utilize additional algorithms that can reduce the stupidity of the LRU, allowing the LRU to make minimally decent decisions, making it less troublesome for older kernels
   - **MGLRU**: Aim for maximum efficiency and zero swapping costs, avoid spending more CPU on swapping tasks than strictly necessary, allowing you to drastically reduce CPU usage from memory management as a whole. This greatly reduces CPU and I/O stalls
-    - Scale the need for swapping and thrashing prevention according to the amount of device memory. Have a better-defined standard than the one used by Google by default. Almost like exclusive optimizations tailored to the device and its needs for multitasking and efficiency
+    - Scale the need for swapping using Google and Samsung's standards, which are said to be among the best, as seen in Samsung devices with decent multitasking that doesn't push the SOC to its limits. Furthermore, scale the amount of swapping the system can tolerate depending on the amount of memory, reducing CPU spikes. But as a main strategy: make swapping cheaper than it already is, allowing MGLRU to be extracted to its maximum potential according to kernel compatibility
     - Reduce CPU usage from memory management such as swapping and similar tasks as much as possible, returning up to 2%-10% of free CPU to the user, proportionally reducing power consumption
-  - Seek a swapping behavior that allows ZRAM to be exploited to its maximum potential, minimizing the need to access storage and enabling the application of caching techniques to keep data in memory for as long as possible without negatively impacting performance, as in thrashing situations, maximizing the potential of swapping, compaction, and the ability of MGLRU/LRU to deallocate memory
+  - **Both**: Aim for predictable and consistent swapping behavior; avoid "bursty" or system-heavy behavior. With this behavior, swapping on most devices will run with maximum efficiency under load, although it still has its limits, obviously
+    - Adapt swapping management for THREE variables: users who use only ZRAM, users who use ZRAM and a swapfile, and users who use only a swapfile. Making swapping more efficient according to the user's choice (such as those with UFS 5.0 storage who don't mind spending extra writes)
     - Make swapping a background task, following the logic that kswapd needs to be as efficient as possible, reducing the impact of powerful algorithms on the CPU, allowing for better swapping efficiency
     - Keep storage usage for memory management tasks such as writebacks or dirty data as low as possible; minimize writes to storage to allow the device to have a longer lifespan than expected
-    - Since low-mem devices (6GB or less) are easily thrashed due to their low margin for error, thrashing can easily occur in situations of memory pressure. Because of this: Utilize the swap parameters of the low memory killer daemon + MGLRU's thrashing prevention to create a highly efficient anti-thrashing formula
-  - Offer Per-Process Reclaim as an additional Reclaim, where it is triggered in situations where the device's normal Reclaim does not resolve the situation and needs help, and that's where Per-Process Reclaim comes in and helps the standard reclaim, prioritizing the reclaiming of memory from processes with adj 801 or greater and with the precision varying if the device has MGLRU or LRU
+  - Offer Per-Process Reclaim from the Qualcomm device kernel as a way to achieve secondary reclaim. With this, PPR can be useful, with controlled aggressiveness to minimize system impact, and with the ability to respect limitations and special features, such as whether the device has MGLRU or LRU as needed
 - It prohibits recycling threads from running on prime cores, running only on big and LITTLE cores, preventing the scheduler from improperly placing these threads on prime cores, wasting energy where these threads could run on big or LITTLE more efficiently, nullifying the impact on energy consumption due to poor scheduling 
-- Compact memory more often, even if the memory allocation was estimated to be due to a low-memory status. This lets us put more data into RAM at the expense of running compation more often. This is a worthy tradeoff, as it reduces memory fragmentation, which is incredibly important for ZRAM. In return, we will keep more processes running even under heavy loads
+- Integrate memory compaction behavior into Android's "intermittent" memory style, which allows the kernel to: Compact memory more often, even if the memory allocation was estimated to be due to a low-memory status. This lets us put more data into RAM at the expense of running compation more often. This is a worthy tradeoff, as it reduces memory fragmentation, which is incredibly important for ZRAM. In return, we will keep more processes running even under heavy loads
 - Customizable ZRAM size and algorithm, as well as customizable I/O algorithm, swapfile size, and additional features like the ability to use dedup, choice of how aggressive memory compression is at the expense of speed the algorithms will have (between zstd, deflate and lz4hc), in addition to selecting and recommending a compression algorithm based on SOC capabilities. Of course, kernel compatibility is required for all of this. Also, aim for a compression ratio of 3.1x which is ideal for Modern Android, try to avoid dropping below that
 - SELinux can still be enabled
 
@@ -47,25 +50,28 @@ Modern memory management optimization for both legacy and modern devices. Contai
 
 - Install this module, restart your phone, and open `/sdcard/Android/panel_memcfg.txt` after rebooting to modify the desired ZRAM size, compression algorithm and others params. This will take effect after rebooting.
 - Open `/sdcard/Android/panel_adjshield.txt` to add the package names of the applications you want to keep running in the background. This will take effect after rebooting.
-- The default ZRAM sizes are based on AOSP and "serious OEM tuning", which are as follows:
-  - 1GB RAM: 512MB ZRAM for LRU and MGLRU.
-  - 2GB RAM: 1GB ZRAM for LRU and 1.2GB for MGLRU.
-  - 3GB RAM: 1.5GB ZRAM for LRU and 2.1GB for MGLRU.
-  - 4GB RAM: 2GB ZRAM for LRU and 3GB for MGLRU.
-  - 6GB RAM: 3GB ZRAM for LRU and MGLRU.
-  - 8GB RAM: 4GB ZRAM for LRU and MGLRU.
-  - 12GB or more RAM: 6GB ZRAM for LRU and MGLRU.
+- The default SWAP (ZRAM & Swapfile) sizes and parameters are based on AOSP and "serious OEM tuning", which are as follows:
+  - 1GB RAM: 512MB ZRAM. A 1GB swap file is added to supplement the backend.
+  - 2GB RAM: 1GB ZRAM. A 1GB swap file is added to supplement the backend.
+  - 3GB RAM: 1.5GB ZRAM.
+  - 4GB RAM: 2GB ZRAM.
+  - 6GB RAM: 3GB ZRAM.
+  - 8GB RAM: 4GB ZRAM.
+  - 12GB or more RAM: 6GB ZRAM.
   - It also includes automatic selection of the compression algorithm, where lz4 is the primary/fallback, choosing between it and lz4kd and zstd based on the following variables:
     - The device supports these algorithms in the kernel.
     - The device has a LITTLE cluster with 2GHz or more (for zstd)
-    - The device has 4GB of RAM or less (for lz4kd)
+    - The device has 6GB of RAM or less (for lz4kd)
   - The panel also contains a recommendation for the algorithm that has the most potential to be the best for the user's environment, taking into account processor capacity, amount of RAM, and algorithm availability.
   - ZRAM Dedup is enabled by default on devices with MGLRU. Disabled by default for devices with LRU.
   - It is not recommended to set zram size larger than your device’s physical RAM, as it may cause system instability.
-  - Algorithms such as lzo, lzo-rlt, and deflate are not recommended. They can be used by the user, but are not recommended due to their inefficiency and only being useful in specific ROMs (such as lzo and lzo-rlt being useful in HyperOS/MIUI).
+  - Algorithms such as lzo, lzo-rlt and deflate are not recommended. They can be used by the user, but are not recommended due to their inefficiency and only being useful in specific ROMs (such as lzo and lzo-rlt being useful in HyperOS/MIUI).
+  - Swapfile is ONLY recommended if you suffer a lot from small multitasking and need more memory urgently, but remember: this will affect your storage considerably, so know what you're doing.
+  - If you have the "mq-deadline" I/O algorithm, only use it if you have UFS below version 4.0, because UFS below that version may suffer from read saturation in demanding situations, something that mq-deadline completely resolves in them.
 - ZSWAP is currently not supported.
-- Support for per-app cgroup. This is added to devices without cgroupv2, allowing devices to have a slightly better cgroup compared to before, which is only for Android 10 and above.
+- Support for per-app cgroup. This is added to devices without cgroupv2 and possess MEMCG, allowing devices to have a slightly better cgroup compared to before, which is only for Android 10 and above.
 - Devices with 6GB or less are considered "lowmem," while devices with 8GB or more are considered "high perf."
+- A1Memory is only available for automatic installation on Android ROMs 14 and below, because support for Android 15 or higher has been discontinued.
 
 ## Uninstallation
 
