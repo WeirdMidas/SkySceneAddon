@@ -22,6 +22,7 @@ Details see [the lead project](https://github.com/yc9559/qti-mem-opt/commits/mas
 - **🥼 Prevent your most important app from being killed** - Customizable list of protected APPs, preventing them from being killed by both in-kernel and in-userspace lowmemorykiller
 - **⚠️ Prevent important data from being swapped** - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
 - **🦺 Allow the user to configure memory recycling threads as they see fit!** - Allow the user to configure the scheduling of memory recycling threads as desired, benefiting from changing their nice, uclamp, cpuset, and shares for these threads, giving maximum freedom for user customization
+- **💪 Use Google's recommendations for all supported devices** - Simply apply all the parameters that Google considers "gold" according to your generation, allowing all devices to operate with the correct recommendations for your device
 - **🔄 Improve swapping behavior according to the algorithm used** - The way the module optimizes swapping behavior depends entirely on the algorithm used by the kernel, as specified below:
   - **LRU**: Focus on being aggressive so LRU stops being STUPID and IDIOTIC! He needs to learn that we can't leave everything to the last minute and that every SOC has its limits, so make him aggressive to mitigate his naiveté
     - Avoid swapping memory pages which are hard to compress to ZRAM, make the compression rate close to the ideal value of 2.8x for legacy Android
