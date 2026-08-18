@@ -29,7 +29,7 @@ Details see [the lead project](https://github.com/yc9559/qti-mem-opt/commits/mas
     - Make the LRU less indecisive by considering the limitations and needs of each device individually; avoid a "universal value" for everyone to improve the stupidity of LRU and make it more usable
   - **MGLRU**: Focus on zero swapping costs, free up cycles for user and UX tasks, making memory management completely asynchronous and lightweight on the CPU
     - Scale swap needs based on the device using Google and Samsung's recommendations in this regard, this brings the compression rate closer to the ideal 3.1x for modern Android
-- **📝 Let the user customize it a bit!** - Customizable ZRAM size and algorithm, swapfile size and the I/O scheduler. Of course, kernel compatibility is required for all of this
+- **📝 Let the user customize it a bit!** - Customizable ZRAM size, ZRAM algorithm, and swapfile size. Of course, kernel compatibility is required for all of this
 - **📊 Safe, efficient, and tested multiple times** - SELinux can still be enabled
 
 ## Requirements
