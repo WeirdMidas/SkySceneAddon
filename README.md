@@ -9,9 +9,9 @@
 - Fixed system common files in the file page cache, which significantly reduced the stucks caused by the key cache being swapped out due to page cache fluctuations
 - The way the module optimizes swapping behavior depends entirely on the algorithm used by the kernel, as specified below:
   - **Traditional LRU**: Abandon the aggressiveness we wanted before, focus on making Traditional LRU more precise, lighter on the CPU, and avoiding evicting/swapping important pages
-    - Avoid swapping memory pages which are hard to compress to ZRAM, make the compression rate close to the ideal value of 2.8x for this type of algorithm
+    - Make kswapd act smoothly and predictably, without CPU usage spikes to meet user demands. Maintain a healthy compression ratio of 2.8x as much as possible
   - **MGLRU**: Focus on delivering more efficient memory recycling behavior, avoid unnecessary aggression, and always make swapping the first option, leaving LMK as a last resort
-    - Scale swapping needs based on the gold standard values recommended by Google and Samsung. This make the compression rate close to the ideal value of 3.1x for this type of algorithm
+    - Scale swapping needs based on the gold standard values ​​recommended by Google and Samsung. This maintains a healthy compression ratio of 3.1x or higher for this algorithm
 - The module provides up to 6GB of ZRAM and 4GB of Swapfile, with the ability to select the compression algorithm. Many parameters can be modified in the configuration parameter file, in addition to, of course, needing compatibility with your kernel. They will take effect after reboot. Please pay attention to the comments
 - SELinux can still be enabled
 
